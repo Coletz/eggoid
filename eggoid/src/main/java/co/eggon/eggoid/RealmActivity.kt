@@ -79,7 +79,7 @@ open class RealmActivity : FragmentActivity() {
 
     fun <T : RealmObject> remove(obj: T) {
         if (realm == null) {
-            throw RealmException("Can't insert data into a closed realm")
+            throw RealmException("Can't remove data from a closed realm")
         } else {
             realm!!.executeTransaction {
                 obj.deleteFromRealm()
@@ -89,7 +89,7 @@ open class RealmActivity : FragmentActivity() {
 
     fun <T : RealmModel> remove(list: RealmList<T>) {
         if (realm == null) {
-            throw RealmException("Can't insert data into a closed realm")
+            throw RealmException("Can't remove data from a closed realm")
         } else {
             realm!!.executeTransaction {
                 list.deleteAllFromRealm()
@@ -99,7 +99,7 @@ open class RealmActivity : FragmentActivity() {
 
     fun <T : RealmModel> remove(kclass: KClass<T>, criteria: List<Pair<String, String>>, case: Case = Case.INSENSITIVE): RealmPromise<Boolean> {
         if (realm == null) {
-            throw RealmException("Can't insert data into a closed realm")
+            throw RealmException("Can't remove data from a closed realm")
         } else {
             return realm.remove(kclass, criteria, case)
         }
