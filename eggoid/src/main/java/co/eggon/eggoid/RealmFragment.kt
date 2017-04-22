@@ -1,7 +1,6 @@
 package co.eggon.eggoid
 
-import android.os.Bundle
-import android.support.v4.app.FragmentActivity
+import android.support.v4.app.Fragment
 import co.eggon.eggoid.extension.create
 import co.eggon.eggoid.extension.debug
 import co.eggon.eggoid.extension.remove
@@ -10,12 +9,12 @@ import io.realm.*
 import io.realm.exceptions.RealmException
 import kotlin.reflect.KClass
 
-open class RealmActivity : FragmentActivity() {
+open class RealmFragment : Fragment() {
     internal var realm: Realm? = null
     private var realmConfig: RealmConfiguration? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onStart() {
+        super.onStart()
         realmConfig = onRealmSetup()
         open()
     }
@@ -24,8 +23,8 @@ open class RealmActivity : FragmentActivity() {
         return null
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onStop() {
+        super.onStop()
         close()
     }
 
