@@ -11,6 +11,7 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0.0"
+        // to compile the .aar run ./gradlew clean build publish
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
