@@ -8,15 +8,16 @@ To import the library put in your app's module:
 ```
 repositories { 
     maven { 
-        url 'todo' 
+        url 'https://api.bitbucket.org/1.0/repositories/eggon/eggon-android-library/raw/master/maven-repo' 
         credentials { 
-            username 'username' 
-            password 'password' 
+            // insert these in your gradle.properties
+            username bitbucket_username
+            password bitbucket_password
         } 
     } 
 } 
 dependencies { 
-    compile 'co.eggon:eggoid:1.0'
+    compile 'co.eggon:eggoid:1.0.0'
 }
 ```
 
@@ -70,7 +71,7 @@ ServiceFactory().with(UserService::kclass).listToRealm(realm) // users are now s
 
 ## Groupie
 
-Groupie will help you editing View´s attribute/listener for more views at once
+Groupie will help you editing Viewï¿½s attribute/listener for more views at once
 Usage is really simple:
 `Groupie(view1, view2, viewN).setOnClickListener(..)`
 or
