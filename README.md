@@ -70,7 +70,7 @@ ServiceFactory().with(UserService::kclass).listToRealm(realm) // users are now s
 
 ## Groupie
 
-Groupie will help you editing ViewÂ´s attribute/listener for more views at once
+Groupie will help you editing View´s attribute/listener for more views at once
 Usage is really simple:
 `Groupie(view1, view2, viewN).setOnClickListener(..)`
 or
@@ -78,6 +78,3 @@ or
 
 Animation are partially supported as now
 `Groupie(..).animate().setDuration(..).otherAttribute(..)`
-
-##TODO: Add bind function inside RealmActivity, RealmFragment and a View extension
-https://medium.com/@quiro91/improving-findviewbyid-with-kotlin-4cf2f8f779bb
