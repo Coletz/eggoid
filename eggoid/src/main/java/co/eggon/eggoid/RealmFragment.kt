@@ -1,7 +1,6 @@
 package co.eggon.eggoid
 
-import android.os.Bundle
-import android.support.v4.app.FragmentActivity
+import android.support.v4.app.Fragment
 import co.eggon.eggoid.extension.create
 import co.eggon.eggoid.extension.debug
 import co.eggon.eggoid.extension.remove
@@ -10,12 +9,12 @@ import io.realm.*
 import io.realm.exceptions.RealmException
 import kotlin.reflect.KClass
 
-open class RealmActivity : FragmentActivity() {
+open class RealmFragment : Fragment() {
     internal var realm: Realm? = null
     private var realmConfig: RealmConfiguration? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    override fun onStart() {
+        super.onStart()
         realmConfig = onRealmSetup()
         open()
     }
@@ -24,8 +23,8 @@ open class RealmActivity : FragmentActivity() {
         return null
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
+    override fun onStop() {
+        super.onStop()
         close()
     }
 
@@ -79,7 +78,7 @@ open class RealmActivity : FragmentActivity() {
 
     fun <T : RealmObject> remove(obj: T) {
         if (realm == null) {
-            throw RealmException("Can't remove data from a closed realm")
+            throw RealmException("Can't insert data into a closed realm")
         } else {
             realm!!.executeTransaction {
                 obj.deleteFromRealm()
@@ -89,7 +88,7 @@ open class RealmActivity : FragmentActivity() {
 
     fun <T : RealmModel> remove(list: RealmList<T>) {
         if (realm == null) {
-            throw RealmException("Can't remove data from a closed realm")
+            throw RealmException("Can't insert data into a closed realm")
         } else {
             realm!!.executeTransaction {
                 list.deleteAllFromRealm()
@@ -99,7 +98,7 @@ open class RealmActivity : FragmentActivity() {
 
     fun <T : RealmModel> remove(kclass: KClass<T>, criteria: List<Pair<String, String>>, case: Case = Case.INSENSITIVE): RealmPromise<Boolean> {
         if (realm == null) {
-            throw RealmException("Can't remove data from a closed realm")
+            throw RealmException("Can't insert data into a closed realm")
         } else {
             return realm.remove(kclass, criteria, case)
         }
