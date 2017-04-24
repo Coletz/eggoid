@@ -71,7 +71,7 @@ ServiceFactory().with(UserService::kclass).listToRealm(realm) // users are now s
 
 ## Groupie
 
-Groupie will help you editing View�s attribute/listener for more views at once
+Groupie will help you editing View's attribute/listener for more views at once
 Usage is really simple:
 `Groupie(view1, view2, viewN).setOnClickListener(..)`
 or
