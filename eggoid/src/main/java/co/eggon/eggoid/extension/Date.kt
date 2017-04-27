@@ -9,7 +9,8 @@ fun Date.ageNow(): Int {
     val birthday = Calendar.getInstance()
     birthday.time = this
     var diff = now.get(Calendar.YEAR) - birthday.get(Calendar.YEAR)
-    if (birthday.get(Calendar.MONTH) > now.get(Calendar.MONTH) || birthday.get(Calendar.MONTH) == now.get(Calendar.MONTH) && birthday.get(Calendar.DATE) > now.get(Calendar.DATE)) {
+    if (birthday.get(Calendar.MONTH) > now.get(Calendar.MONTH) ||
+            birthday.get(Calendar.MONTH) == now.get(Calendar.MONTH) && birthday.get(Calendar.DATE) > now.get(Calendar.DATE)) {
         diff--
     }
     return diff
@@ -45,5 +46,5 @@ fun String?.asDate(fromFormat: String = "yyyy-MM-dd'T'HH:mm:ssZ"): Date? {
 }
 
 fun String?.asFormattedDate(inputFormat: String = "yyyy-MM-dd'T'HH:mm:ssZ", outputFormat: String = "dd/MM/yyyy"): String? {
-    return this.asDate().asString()
+    return this.asDate(inputFormat).asString(outputFormat)
 }

@@ -11,7 +11,6 @@ import kotlin.reflect.KClass
 /**
  * Insert a RealmObject / RealmList<E> on realm
  **/
-
 fun <E : RealmModel> Realm?.create(obj: E): RealmPromise<E> {
 
     val promise = RealmPromise<E>()
