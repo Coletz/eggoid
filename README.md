@@ -29,7 +29,7 @@ A default realm instance will be opened at `onCreate` (for RealmActivity) or at 
 To configure a realm instance you just need to override the `onRealmSetup` method and return a customized `RealmConfiguration`
 
 ```
-override onRealmSetup(){
+override fun onRealmSetup(){
     val realmConfig = RealmConfiguration.Builder().name("custom.realm")
     return realmConfig.build()
 }
@@ -37,7 +37,7 @@ override onRealmSetup(){
 
 Anyawy a shorter way to do that with Kotlin is using inline functions:
 ```
-override onRealmSetup() = RealmConfiguration.Builder().name("custom.realm").build()
+override fun onRealmSetup() = RealmConfiguration.Builder().name("custom.realm").build()
 ```
 
 If you need to change the realm instance/configuration you're using you can easily do that with the `changeConfig(RealmConfiguration.Builder().name("new.realm").build())` method
