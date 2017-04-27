@@ -4,7 +4,7 @@ import android.animation.AnimatorListenerAdapter
 import android.view.View
 import android.view.ViewPropertyAnimator
 
-class Groupie<T: View>(vararg views: T) {
+class Groupie<T : View>(vararg views: T) {
 
     val mViews = ArrayList(views.asList())
     var mAnimator = Animator()
@@ -12,12 +12,12 @@ class Groupie<T: View>(vararg views: T) {
     var visibility: Int = View.VISIBLE
         set(value) {
             field = value
-            if(value == View.VISIBLE || value == View.INVISIBLE || value == View.GONE){
+            if (value == View.VISIBLE || value == View.INVISIBLE || value == View.GONE) {
                 mViews.forEach { it.visibility = value }
             }
         }
 
-    fun setOnClickListener(listener: ((View) -> Unit)?){
+    fun setOnClickListener(listener: ((View) -> Unit)?) {
         mViews.forEach { it.setOnClickListener { listener?.invoke(it) } }
     }
 

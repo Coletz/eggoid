@@ -1,81 +1,119 @@
-### What is this repository for? ### 
+![Bitbucket Version](https://img.shields.io/badge/Version-1.1.2-brightgreen.svg)
+
+# What is this repository for?
 
 This repository is for Eggon's Android library, Eggoid. 
 
-### Installation ### 
+# Installation
 
 To import the library put in your app's module: 
-```
+```gradle
 repositories { 
     maven { 
         url 'https://api.bitbucket.org/1.0/repositories/eggon/eggon-android-library/raw/master/maven-repo' 
         credentials { 
-            // insert these in your gradle.properties
+            // insert these in your gradle.properties like this:
+            // bitbucket_username=youremail@eggonemail.com
+            // bitbucket_password=yourpassword
             username bitbucket_username
             password bitbucket_password
         } 
     } 
 } 
 dependencies { 
-    compile 'co.eggon:eggoid:1.0.0'
+    compile 'co.eggon:eggoid:1.1.2'
 }
 ```
 
-## RealmActivity/RealmFragment
+# Usage
+### RealmActivity/RealmFragment
 
-These class will help you handle realm with ease. Just extend RealmActivity/RealmFragment and you're done.
-A default realm instance will be opened at `onCreate` (for RealmActivity) or at `onStart` (for RealmFragment) and it will be closed at `onDestroy/onStop` respectively for RealmActivity and RealmFragment.
+These classes will help you handle Realm with ease. Just extend RealmActivity/RealmFragment and you're done.
+A default Realm instance will be opened at `onCreate` (for RealmActivity) or at `onStart` (for RealmFragment) and it will be closed at `onDestroy/onStop` respectively for RealmActivity and RealmFragment.
+The Realm instance is simply called "realm".
 
-To configure a realm instance you just need to override the `onRealmSetup` method and return a customized `RealmConfiguration`
+To configure a Realm instance you just need to override the `onRealmSetup` method and return a customized `RealmConfiguration`
 
-```
-override onRealmSetup(){
+```kotlin
+override fun onRealmSetup(){
     val realmConfig = RealmConfiguration.Builder().name("custom.realm")
     return realmConfig.build()
 }
 ```
 
-Anyawy a shorter way to do that with Kotlin is using inline functions:
+Anyway a shorter way to do that with Kotlin is using inline functions:
+```kotlin
+override fun onRealmSetup():RealmConfiguration = RealmConfiguration.Builder().name("custom.realm").build()
 ```
-override onRealmSetup() = RealmConfiguration.Builder().name("custom.realm").build()
+
+If you need to change the Realm instance/configuration you're using you can easily do that with  `changeConfig(RealmConfiguration.Builder().name("new.realm").build())`
+
+### RetroRealm
+
+This extension is just an helper to avoid Retrofit + RxJava + Realm boilerplate, and currently there are 4 methods:
+
+* `Observable<RealmModel>.objectToRealm(realm: Realm?, update: Boolean = true, beforeSave: ((RealmModel) -> Unit)? = null): RealmPromise<RealmModel>`
+
+* `Observable<RealmList<RealmModel>>.listToRealm(...): RealmPromise<RealmList<RealmModel>>`
+
+* `Observable<DataWrapper>.listToRealm(...): RealmPromise<DataWrapper>`
+
+* `Observable<DataListWrapper>.listToRealm(...): RealmPromise<DataListWrapper>`
+
+The last 2 methods are used when the server's actual response is wrapped in a "data" field.
+
+To use `DataWrapper` and `DataListWrapper` simply implement the one you need and override the field as requested and specify what class will the "data" field contain.
+```kotlin
+class SomeResponse : DataWrapper {
+    @JsonDeserialize(`as` = MyWrappedRealmObject::class)
+    override var data: RealmModel? = null
+}
+```
+```kotlin
+class SomeResponse : DataListWrapper {
+    @JsonDeserialize(contentAs = MyWrappedRealmObject::class)
+    override var data: RealmList<RealmModel>? = null
+}
 ```
 
-If you need to change the realm instance/configuration you're using you can easily do that with the `changeConfig(RealmConfiguration.Builder().name("new.realm").build())` method
-
-## RealmPromise
-Using RealmActivity/RealmFragment you will also get RealmPromise and some helper method like insert, remove and select
-
-Example usage will be added ASAP
-
-## RetroRealm
-
-This extension is just an helper to avoid retrofit + rxjava + realm boilerplate, and provide two methods:
-`Observable.objectToRealm(realm: Realm?, update: Boolean = true, beforeSave: ((RealmModel) -> Unit)? = null): RealmPromise`
-and
-`Observable.listToRealm(realm: Realm?, update: Boolean = true, beforeSave: ((RealmList) -> Unit)? = null): RealmPromise`
-
-These two methods are nearly identical, but as the name suggest the first is for saving a single object, the second one is for saving a list of objects.
-They provide a beforeSave callback, that can help you adding for example a customized primary key (since realm doesn't support composed keys)
+These methods provide a beforeSave callback, that can help you add, for example, a customized primary key (since Realm doesn't support composed keys).
 Usage:
-```
-YourObservableThatReaturnsRealmObject().objectToRealm(realm, false, { it.partOne + it.partTwo });
+```kotlin
+MyObservableRealmObject().objectToRealm(realm, false, { it.partOne + it.partTwo });
 
-YourObservableThatReaturnsRealmList().listToRealm(realm, beforeSave = { it.forEach { it.partOne + it.partTwo } });
-```
-
-So for a realm world example, mixing RealmActivity and RetroRealm, you just need to pass the realm instance given by the activity, and implement your ServiceFactory and REST service interface:
-
-```
-ServiceFactory().with(UserService::kclass).listToRealm(realm) // users are now stored on realm
+MyObservableRealmList().listToRealm(realm, beforeSave = { it.forEach { it.partOne + it.partTwo } });
 ```
 
-## Groupie
+So for a real world example, mixing RealmActivity and RetroRealm, you just need to pass the Realm instance given by the activity, and implement your ServiceFactory and REST service interface:
 
-Groupie will help you editing View's attribute/listener for more views at once
+```kotlin
+ServiceFactory().with(UserService::kclass)
+                .getAllUsers()      // API call that returns Observable<RealmList<User>>
+                .listToRealm(realm) // users are now stored on realm
+```
+
+### RealmPromise
+Using RealmActivity/RealmFragment you will also get RealmPromise and some helper method like insert, remove and select. Simply chain calls that return a RealmPromise to use .then or .onError for example the previous call can be enriched with:
+
+```kotlin
+ServiceFactory().with(UserService::kclass)
+                .getAllUsers()      // API call that returns Observable<RealmList<User>>
+                .listToRealm(realm) // users are now stored on Realm
+                .then {
+                    // do something with the RealmList<User>
+                }
+                .onError {
+                    handle(it)      // it is a Throwable
+                }
+```
+
+### Groupie
+
+Groupie will help you edit multiple views' attributes/listeners at once.
 Usage is really simple:
 `Groupie(view1, view2, viewN).setOnClickListener(..)`
 or
-`Groupie(..).visibility = View.GONE`
+`Groupie(...).visibility = View.GONE`
 
 Animation are partially supported as now
-`Groupie(..).animate().setDuration(..).otherAttribute(..)`
+`Groupie(...).animate().setDuration(..).otherAttribute(..)`

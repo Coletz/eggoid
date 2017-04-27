@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This xml is for ignoring warnings fired by Lint when running the publish command,
+ see "Issues" at https://guides.codepath.com/android/Consuming-APIs-with-Retrofit for more information.
+ Same for jackson -->
+<lint>
+    <issue id="InvalidPackage">
+        <ignore regexp=".*okio.*" />
+        <ignore regexp=".*retrofit.*" />
+        <ignore regexp=".*jackson.*" />
+    </issue>
+</lint>

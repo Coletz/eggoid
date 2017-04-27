@@ -11,7 +11,7 @@ import io.realm.exceptions.RealmException
 import kotlin.reflect.KClass
 
 open class RealmActivity : FragmentActivity() {
-    internal var realm: Realm? = null
+    protected var realm: Realm? = null
     private var realmConfig: RealmConfiguration? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
