@@ -65,7 +65,5 @@ private fun Any?.log(obj: Any? = null, level: Int = ERROR) {
     if (this is Throwable) {
         e(logger, "******** STACK TRACE ********")
         this.printStackTrace()
-    } else {
-        e(logger, "Not a throwable")
     }
 }
