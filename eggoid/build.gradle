@@ -9,8 +9,8 @@ android {
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 25
-        versionCode 111
-        versionName "1.1.1"
+        versionCode 112
+        versionName "1.1.2"
         // to compile the .aar run ./gradlew clean build publish
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
