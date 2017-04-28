@@ -1,8 +1,8 @@
 package co.eggon.eggoid
 
 class RealmPromise<T> {
-    var action: ((T) -> Unit)? = null
-    var error: ((Throwable) -> Unit)? = null
+    internal var action: ((T) -> Unit)? = null
+    internal var error: ((Throwable) -> Unit)? = null
 
     infix fun then(promise: (T) -> Unit): RealmPromise<T> {
         action = promise
