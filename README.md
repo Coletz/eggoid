@@ -1,4 +1,4 @@
-![Bitbucket Version](https://img.shields.io/badge/Version-1.1.2-brightgreen.svg)
+![Bitbucket Version](https://img.shields.io/badge/Version-1.1.3-brightgreen.svg)
 
 # What is this repository for?
 
@@ -21,7 +21,7 @@ repositories {
     } 
 } 
 dependencies { 
-    compile 'co.eggon:eggoid:1.1.2'
+    compile 'co.eggon:eggoid:1.1.3'
 }
 ```
 
@@ -64,15 +64,13 @@ The last 2 methods are used when the server's actual response is wrapped in a "d
 
 To use `DataWrapper` and `DataListWrapper` simply implement the one you need and override the field as requested and specify what class will the "data" field contain.
 ```kotlin
-class SomeResponse : DataWrapper {
-    @JsonDeserialize(`as` = MyWrappedRealmObject::class)
-    override var data: RealmModel? = null
+class SomeResponse : DataWrapper<WrappedRealmObject> {
+    override var data: WrappedRealmObject? = null
 }
 ```
 ```kotlin
-class SomeResponse : DataListWrapper {
-    @JsonDeserialize(contentAs = MyWrappedRealmObject::class)
-    override var data: RealmList<RealmModel>? = null
+class SomeResponse : DataListWrapper<WrappedRealmObject> {
+    override var data: RealmList<WrappedRealmObject>? = null
 }
 ```
 
@@ -87,7 +85,7 @@ MyObservableRealmList().listToRealm(realm, beforeSave = { it.forEach { it.partOn
 So for a real world example, mixing RealmActivity and RetroRealm, you just need to pass the Realm instance given by the activity, and implement your ServiceFactory and REST service interface:
 
 ```kotlin
-ServiceFactory().with(UserService::kclass)
+ServiceFactory().with(UserService::class)
                 .getAllUsers()      // API call that returns Observable<RealmList<User>>
                 .listToRealm(realm) // users are now stored on realm
 ```
@@ -96,7 +94,7 @@ ServiceFactory().with(UserService::kclass)
 Using RealmActivity/RealmFragment you will also get RealmPromise and some helper method like insert, remove and select. Simply chain calls that return a RealmPromise to use .then or .onError for example the previous call can be enriched with:
 
 ```kotlin
-ServiceFactory().with(UserService::kclass)
+ServiceFactory().with(UserService::class)
                 .getAllUsers()      // API call that returns Observable<RealmList<User>>
                 .listToRealm(realm) // users are now stored on Realm
                 .then {

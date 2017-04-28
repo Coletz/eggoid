@@ -4,31 +4,26 @@ import io.realm.RealmList
 import io.realm.RealmModel
 
 /**
- * In any class that implements this interface, the overridden data property must have
- * the following annotation:
- * @JsonDeserialize(`as` = MyWrappedRealmObject::class)
+ * The class implementing this interface must specify what type of RealmObject it is wrapping.
  *
  * Example:
- * class SomeResponse : DataWrapper {
- *     @JsonDeserialize(`as` = MyWrappedRealmObject::class)
- *     override var data: RealmModel? = null
+ * class SomeResponse : DataWrapper<WrappedRealmObject> {
+ *     override var data: WrappedRealmObject? = null
  * }
  */
-interface DataWrapper {
-    var data: RealmModel?
+interface DataWrapper<T : RealmModel> {
+    var data: T?
 }
 
 /**
- * In any class that implements this interface, the overridden data property must have
- * the following annotation:
- * @JsonDeserialize(contentAs = MyWrappedRealmObject::class)
+ * The class implementing this interface must specify what type of RealmObject the list
+ * is wrapping.
  *
  * Example:
- * class SomeResponse : DataListWrapper {
- *     @JsonDeserialize(contentAs = MyWrappedRealmObject::class)
- *     override var data: RealmList<RealmModel>? = null
+ * class SomeResponse : DataListWrapper<WrappedRealmObject> {
+ *     override var data: RealmList<WrappedRealmObject>? = null
  * }
  */
-interface DataListWrapper {
-    var data: RealmList<RealmModel>?
+interface DataListWrapper<T: RealmModel> {
+    var data: RealmList<T>?
 }
