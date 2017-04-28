@@ -50,18 +50,16 @@ fun <E : RealmList<out RealmModel>> Observable<E>.listToRealm(realm: Realm?, upd
 
 /**
  * When using this function to unwrap an object that is returned as a field in the JSON,
- * the class representing the response must implement the DataWrapper interface and
- * the overridden data property must have the following annotation:
- * @JsonDeserialize(`as` = MyWrappedRealmObject::class)
+ * the class representing the response must implement the DataWrapper interface with the type of
+ * RealmObject you want to save.
  *
  * Example:
- * class SomeResponse : DataWrapper {
- *     @JsonDeserialize(`as` = MyWrappedRealmObject::class)
- *     override var data: RealmModel? = null
+ * class SomeResponse : DataWrapper<MyRealmObject> {
+ *     override var data: MyRealmObject? = null
  * }
  */
 @Throws(RealmException::class)
-fun <E : DataWrapper> Observable<E>.wrappedToRealm(realm: Realm?, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
+fun <E : DataWrapper<out RealmModel>> Observable<E>.wrappedToRealm(realm: Realm?, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
     val promise = RealmPromise<E>()
     this.subscribeOn(io.reactivex.schedulers.Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
@@ -88,18 +86,16 @@ fun <E : DataWrapper> Observable<E>.wrappedToRealm(realm: Realm?, update: Boolea
 
 /**
  * When using this function to unwrap a list of objects that is returned as a field in the JSON,
- * the class representing the response must implement the DataListWrapper interface and
- * the overridden data property must have the following annotation:
- * @JsonDeserialize(contentAs = MyWrappedRealmObject::class)
+ * the class representing the response must implement the DataListWrapper interface with the type of
+ * RealmObject you want to save.
  *
  * Example:
- * class SomeResponse : DataListWrapper {
- *     @JsonDeserialize(contentAs = MyWrappedRealmObject::class)
- *     override var data: RealmList<RealmModel>? = null
+ * class SomeResponse : DataListWrapper<MyRealmObject> {
+ *     override var data: RealmList<MyRealmObject>? = null
  * }
  */
 @Throws(RealmException::class)
-fun <E : DataListWrapper> Observable<E>.wrappedListToRealm(realm: Realm?, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
+fun <E : DataListWrapper<out RealmModel>> Observable<E>.wrappedListToRealm(realm: Realm?, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
     val promise = RealmPromise<E>()
     this.subscribeOn(io.reactivex.schedulers.Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
