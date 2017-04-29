@@ -10,7 +10,7 @@ import io.realm.exceptions.RealmException
 import kotlin.reflect.KClass
 
 open class RealmFragment : Fragment() {
-    internal var realm: Realm? = null
+    protected var realm: Realm? = null
     private var realmConfig: RealmConfiguration? = null
 
     override fun onStart() {
