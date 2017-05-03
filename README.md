@@ -1,4 +1,4 @@
-![Bitbucket Version](https://img.shields.io/badge/Version-1.1.3-brightgreen.svg)
+![Bitbucket Version](https://img.shields.io/badge/Version-1.1.4-brightgreen.svg)
 
 # What is this repository for?
 
@@ -21,7 +21,7 @@ repositories {
     } 
 } 
 dependencies { 
-    compile 'co.eggon:eggoid:1.1.3'
+    compile 'co.eggon:eggoid:<see latest version in README>'
 }
 ```
 
