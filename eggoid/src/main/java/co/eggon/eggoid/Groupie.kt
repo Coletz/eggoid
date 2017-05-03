@@ -17,6 +17,18 @@ class Groupie<T : View>(vararg views: T) {
             }
         }
 
+    var focusable: Boolean = true
+        set(value) {
+            field = value
+            mViews.forEach { it.isFocusable = value; it.isFocusableInTouchMode = value }
+        }
+
+    var clickable: Boolean = true
+        set(value) {
+            field = value
+            mViews.forEach { it.isClickable = value }
+        }
+
     fun setOnClickListener(listener: ((View) -> Unit)?) {
         mViews.forEach { it.setOnClickListener { listener?.invoke(it) } }
     }
