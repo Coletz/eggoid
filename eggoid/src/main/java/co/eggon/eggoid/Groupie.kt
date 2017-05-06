@@ -17,13 +17,13 @@ class Groupie<T : View>(vararg views: T) {
             }
         }
 
-    var focusable: Boolean = true
+    var isFocusable: Boolean = true
         set(value) {
             field = value
             mViews.forEach { it.isFocusable = value; it.isFocusableInTouchMode = value }
         }
 
-    var clickable: Boolean = true
+    var isClickable: Boolean = true
         set(value) {
             field = value
             mViews.forEach { it.isClickable = value }

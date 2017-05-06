@@ -16,12 +16,12 @@ fun Date.ageNow(): Int {
     return diff
 }
 
-fun Date?.asString(toFormat: String = "dd/MM/yyyy"): String {
+fun Date?.asString(toFormat: String = "dd/MM/yyyy", locale: Locale = Locale.getDefault()): String {
     if (this == null) {
         return ""
     } else {
         try {
-            val formatter = SimpleDateFormat(toFormat, Locale.ROOT)
+            val formatter = SimpleDateFormat(toFormat, locale)
             return formatter.format(this)
         } catch(e: Exception) {
             e.wtf("Exception")
@@ -30,12 +30,12 @@ fun Date?.asString(toFormat: String = "dd/MM/yyyy"): String {
     }
 }
 
-fun String?.asDate(fromFormat: String = "yyyy-MM-dd'T'HH:mm:ssZ"): Date? {
+fun String?.asDate(fromFormat: String = "yyyy-MM-dd'T'HH:mm:ssZ", locale: Locale = Locale.getDefault()): Date? {
     if (this == null) {
         return null
     } else {
         try {
-            val formatter = SimpleDateFormat(fromFormat, Locale.ROOT)
+            val formatter = SimpleDateFormat(fromFormat, locale)
             return formatter.parse(this)
         } catch(e: Exception) {
             //e.wtf("Exception")
@@ -45,6 +45,6 @@ fun String?.asDate(fromFormat: String = "yyyy-MM-dd'T'HH:mm:ssZ"): Date? {
     }
 }
 
-fun String?.asFormattedDate(inputFormat: String = "yyyy-MM-dd'T'HH:mm:ssZ", outputFormat: String = "dd/MM/yyyy"): String? {
-    return this.asDate(inputFormat).asString(outputFormat)
+fun String?.asFormattedDate(inputFormat: String = "yyyy-MM-dd'T'HH:mm:ssZ", outputFormat: String = "dd/MM/yyyy", locale: Locale = Locale.getDefault()): String? {
+    return this.asDate(inputFormat, locale).asString(outputFormat, locale)
 }
