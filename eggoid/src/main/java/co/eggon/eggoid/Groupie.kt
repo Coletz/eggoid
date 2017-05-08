@@ -2,6 +2,7 @@ package co.eggon.eggoid
 
 import android.animation.AnimatorListenerAdapter
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 
 class Groupie<T : View>(vararg views: T) {
@@ -27,6 +28,24 @@ class Groupie<T : View>(vararg views: T) {
         set(value) {
             field = value
             mViews.forEach { it.isClickable = value }
+        }
+
+    var layoutParams: ViewGroup.LayoutParams = ViewGroup.LayoutParams(0,0)
+        set(value) {
+            field = value
+            mViews.forEach { it.layoutParams = value }
+        }
+
+    var lpWidth: Int = 0
+        set(value) {
+            field = value
+            mViews.forEach { it.layoutParams.width = value }
+        }
+
+    var lpHeight: Int = 0
+        set(value) {
+            field = value
+            mViews.forEach { it.layoutParams.height= value }
         }
 
     fun setOnClickListener(listener: ((View) -> Unit)?) {
