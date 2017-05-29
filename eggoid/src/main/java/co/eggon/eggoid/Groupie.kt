@@ -1,13 +1,15 @@
 package co.eggon.eggoid
 
 import android.animation.AnimatorListenerAdapter
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 
 class Groupie<T : View>(vararg views: T) {
 
-    val mViews = ArrayList(views.asList())
+    private val mViews = ArrayList(views.asList())
     var mAnimator = Animator()
 
     var visibility: Int = View.VISIBLE
@@ -16,6 +18,18 @@ class Groupie<T : View>(vararg views: T) {
             if (value == View.VISIBLE || value == View.INVISIBLE || value == View.GONE) {
                 mViews.forEach { it.visibility = value }
             }
+        }
+
+    var backgroundColor: Int = Color.WHITE
+        set(value) {
+            field = value
+            mViews.forEach { it.setBackgroundColor(value) }
+        }
+
+    var backgroundRes: Int = 0
+        set(value) {
+            field = value
+            mViews.forEach { it.setBackgroundResource(field) }
         }
 
     var isFocusable: Boolean = true
