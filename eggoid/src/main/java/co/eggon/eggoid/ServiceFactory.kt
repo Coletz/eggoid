@@ -29,11 +29,11 @@ class ServiceFactory {
 
         private val moduleList = ArrayList<Module>()
 
-        fun init(serverAddress: String, enableInterceptor: Boolean = intercept, customTag: String, jsonConverter: Boolean = converter){
+        fun init(serverAddress: String, enableInterceptor: Boolean = intercept, customTag: String = tag, enableJsonConverter: Boolean = converter){
             address = serverAddress
             intercept = enableInterceptor
             tag = customTag
-            converter = jsonConverter
+            converter = enableJsonConverter
         }
 
         fun addModule(vararg module: SimpleModule){
