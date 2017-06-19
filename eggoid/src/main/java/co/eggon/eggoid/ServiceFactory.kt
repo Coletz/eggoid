@@ -25,14 +25,15 @@ class ServiceFactory {
         private var address: String? = null
         private var intercept: Boolean = false
         private var tag: String = "OkHttp"
+        private var converter: Boolean = true
 
         private val moduleList = ArrayList<Module>()
 
-
-        fun init(serverAddress: String, enableInterceptor: Boolean = false, customTag: String){
+        fun init(serverAddress: String, enableInterceptor: Boolean = intercept, customTag: String, jsonConverter: Boolean = converter){
             address = serverAddress
             intercept = enableInterceptor
             tag = customTag
+            converter = jsonConverter
         }
 
         fun addModule(vararg module: SimpleModule){
@@ -45,7 +46,7 @@ class ServiceFactory {
     init {
         if(address == null){
 
-        }else{
+        } else {
             val bodyInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> message.error(tag) })
             bodyInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
@@ -56,25 +57,26 @@ class ServiceFactory {
                 client.addInterceptor(bodyInterceptor)
             }
 
-            val mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            moduleList.forEach {
-                mapper.registerModule(it)
-            }
-            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-            mapper.setAnnotationIntrospector(object : JacksonAnnotationIntrospector() {
-                override fun isIgnorableType(ac: AnnotatedClass?): Boolean? {
-                    if (ac?.rawType == RealmObject::class.java)
-                        return true
-                    return super.isIgnorableType(ac)
-                }
-            })
-
-            retrofit = Retrofit.Builder()
+            val builder = Retrofit.Builder()
                     .baseUrl(address)
                     .client(client.build())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-                    .addConverterFactory(JacksonConverterFactory.create(mapper))
-                    .build()
+            if(converter){
+                val mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+                moduleList.forEach {
+                    mapper.registerModule(it)
+                }
+                mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                mapper.setAnnotationIntrospector(object : JacksonAnnotationIntrospector() {
+                    override fun isIgnorableType(ac: AnnotatedClass?): Boolean? {
+                        if (ac?.rawType == RealmObject::class.java)
+                            return true
+                        return super.isIgnorableType(ac)
+                    }
+                })
+                builder.addConverterFactory(JacksonConverterFactory.create(mapper))
+            }
+            retrofit = builder.build()
         }
     }
 
