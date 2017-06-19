@@ -1,5 +1,6 @@
 package co.eggon.eggoid
 
+import co.eggon.eggoid.extension.error
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.Module
@@ -23,13 +24,15 @@ class ServiceFactory {
         private val MISSING_RETROFIT_MSG = "You must create a ServiceFactory before using it!"
         private var address: String? = null
         private var intercept: Boolean = false
+        private var tag: String = "OkHttp"
 
         private val moduleList = ArrayList<Module>()
 
 
-        fun init(serverAddress: String, enableInterceptor: Boolean = false){
+        fun init(serverAddress: String, enableInterceptor: Boolean = false, customTag: String){
             address = serverAddress
             intercept = enableInterceptor
+            tag = customTag
         }
 
         fun addModule(vararg module: SimpleModule){
@@ -43,7 +46,7 @@ class ServiceFactory {
         if(address == null){
 
         }else{
-            val bodyInterceptor = HttpLoggingInterceptor()
+            val bodyInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> message.error(tag) })
             bodyInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
             val client = OkHttpClient.Builder()
