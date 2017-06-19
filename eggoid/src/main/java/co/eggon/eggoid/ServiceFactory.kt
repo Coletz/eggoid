@@ -23,17 +23,19 @@ class ServiceFactory {
         private val MISSING_INIT_MSG = "You must call ServiceFactory.init(\"https://your.url.com\") before using this function!"
         private val MISSING_RETROFIT_MSG = "You must create a ServiceFactory before using it!"
         private var address: String? = null
-        private var intercept: Boolean = false
+        private var logInterceptor: Boolean = false
+        private var connectionInterceptor: Boolean = false
         private var tag: String = "OkHttp"
         private var converter: Boolean = true
 
         private val moduleList = ArrayList<Module>()
 
-        fun init(serverAddress: String, enableInterceptor: Boolean = intercept, customTag: String = tag, enableJsonConverter: Boolean = converter){
+        fun init(serverAddress: String, enableInterceptor: Boolean = logInterceptor, customTag: String = tag, enableJsonConverter: Boolean = converter, closeConnectionInterceptor: Boolean = connectionInterceptor){
             address = serverAddress
-            intercept = enableInterceptor
+            logInterceptor = enableInterceptor
             tag = customTag
             converter = enableJsonConverter
+            connectionInterceptor = closeConnectionInterceptor
         }
 
         fun addModule(vararg module: SimpleModule){
@@ -53,8 +55,15 @@ class ServiceFactory {
             val client = OkHttpClient.Builder()
                     .readTimeout(30, TimeUnit.SECONDS)
                     .connectTimeout(30, TimeUnit.SECONDS)
-            if(intercept){
+            if(logInterceptor){
                 client.addInterceptor(bodyInterceptor)
+            }
+
+            if(connectionInterceptor){
+                client.addNetworkInterceptor {
+                    val request = it.request().newBuilder().addHeader("Connection", "close").build()
+                    it.proceed(request)
+                }
             }
 
             val builder = Retrofit.Builder()
