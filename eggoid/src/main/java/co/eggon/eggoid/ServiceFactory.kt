@@ -29,9 +29,9 @@ class ServiceFactory {
         private var tag: String = "OkHttp"
 
         private val moduleList: ArrayList<Module>? = ArrayList()
-        private var factory: Converter.Factory? = ConverterFactory.forJson()
+        private var factory: Converter.Factory? = null
 
-        fun init(serverAddress: String, enableInterceptor: Boolean = logInterceptor, customTag: String = tag, converterFactory: Converter.Factory? = factory, closeConnectionInterceptor: Boolean = connectionInterceptor){
+        fun init(serverAddress: String, enableInterceptor: Boolean = logInterceptor, customTag: String = tag, converterFactory: Converter.Factory? = ConverterFactory.forJson(), closeConnectionInterceptor: Boolean = connectionInterceptor){
             address = serverAddress
             logInterceptor = enableInterceptor
             tag = customTag
