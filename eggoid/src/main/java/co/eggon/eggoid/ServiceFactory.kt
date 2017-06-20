@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import io.realm.RealmObject
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.jackson.JacksonConverterFactory
@@ -26,20 +27,25 @@ class ServiceFactory {
         private var logInterceptor: Boolean = false
         private var connectionInterceptor: Boolean = false
         private var tag: String = "OkHttp"
-        private var converter: Boolean = true
+        private var factory: Converter.Factory? = ConverterFactory.forJson()
 
         private val moduleList = ArrayList<Module>()
 
-        fun init(serverAddress: String, enableInterceptor: Boolean = logInterceptor, customTag: String = tag, enableJsonConverter: Boolean = converter, closeConnectionInterceptor: Boolean = connectionInterceptor){
+        fun init(serverAddress: String, enableInterceptor: Boolean = logInterceptor, customTag: String = tag, converterFactory: Converter.Factory? = factory, closeConnectionInterceptor: Boolean = connectionInterceptor){
             address = serverAddress
             logInterceptor = enableInterceptor
             tag = customTag
-            converter = enableJsonConverter
+            factory = converterFactory
             connectionInterceptor = closeConnectionInterceptor
         }
 
+        /**
+         * This will automatically set the factory to JacksonConverterFactory
+         **/
+
         fun addModule(vararg module: SimpleModule){
             module.forEach { moduleList.add(it) }
+            factory = ConverterFactory.forJson()
         }
     }
 
@@ -70,21 +76,11 @@ class ServiceFactory {
                     .baseUrl(address)
                     .client(client.build())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-            if(converter){
-                val mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-                moduleList.forEach {
-                    mapper.registerModule(it)
-                }
-                mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-                mapper.setAnnotationIntrospector(object : JacksonAnnotationIntrospector() {
-                    override fun isIgnorableType(ac: AnnotatedClass?): Boolean? {
-                        if (ac?.rawType == RealmObject::class.java)
-                            return true
-                        return super.isIgnorableType(ac)
-                    }
-                })
-                builder.addConverterFactory(JacksonConverterFactory.create(mapper))
+
+            factory?.let {
+                builder.addConverterFactory(it)
             }
+
             retrofit = builder.build()
         }
     }
@@ -94,6 +90,24 @@ class ServiceFactory {
             throw Exception(MISSING_INIT_MSG)
         } else {
             return retrofit?.create(clazz.java) ?: throw Exception(MISSING_RETROFIT_MSG)
+        }
+    }
+
+    object ConverterFactory {
+        fun forJson(): Converter.Factory {
+            val mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
+            moduleList.forEach {
+                mapper.registerModule(it)
+            }
+            mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            mapper.setAnnotationIntrospector(object : JacksonAnnotationIntrospector() {
+                override fun isIgnorableType(ac: AnnotatedClass?): Boolean? {
+                    if (ac?.rawType == RealmObject::class.java)
+                        return true
+                    return super.isIgnorableType(ac)
+                }
+            })
+            return JacksonConverterFactory.create(mapper)
         }
     }
 }
