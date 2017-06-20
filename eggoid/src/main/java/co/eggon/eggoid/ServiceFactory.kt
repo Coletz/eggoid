@@ -27,9 +27,9 @@ class ServiceFactory {
         private var logInterceptor: Boolean = false
         private var connectionInterceptor: Boolean = false
         private var tag: String = "OkHttp"
-        private var factory: Converter.Factory? = ConverterFactory.forJson()
 
-        private val moduleList = ArrayList<Module>()
+        private val moduleList: ArrayList<Module>? = ArrayList()
+        private var factory: Converter.Factory? = ConverterFactory.forJson()
 
         fun init(serverAddress: String, enableInterceptor: Boolean = logInterceptor, customTag: String = tag, converterFactory: Converter.Factory? = factory, closeConnectionInterceptor: Boolean = connectionInterceptor){
             address = serverAddress
@@ -44,7 +44,7 @@ class ServiceFactory {
          **/
 
         fun addModule(vararg module: SimpleModule){
-            module.forEach { moduleList.add(it) }
+            module.forEach { moduleList?.add(it) }
             factory = ConverterFactory.forJson()
         }
     }
@@ -96,7 +96,7 @@ class ServiceFactory {
     object ConverterFactory {
         fun forJson(): Converter.Factory {
             val mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
-            moduleList.forEach {
+            moduleList?.forEach {
                 mapper.registerModule(it)
             }
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
