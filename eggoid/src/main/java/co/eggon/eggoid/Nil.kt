@@ -1,9 +1,9 @@
 package co.eggon.eggoid
 
 
-class Nil<A, B>(val a: A, val b: B) {
-    operator fun component1(): A = a
-    operator fun component2(): B = b
+class Nil<A, B>(val a: A?, val b: B?) {
+    operator fun component1(): A = a!!
+    operator fun component2(): B = b!!
 
     infix fun let(callback: (Nil<A, B>) -> Unit): Nil<A, B> {
         val objs = listOf(a, b)
@@ -20,9 +20,10 @@ class Nil<A, B>(val a: A, val b: B) {
     }
 }
 
-class Nil3<A, B, C>(val a: A, val b: B, val c: C) {
-    operator fun component1(): A = a
-    operator fun component2(): B = b
+class Nil3<A, B, C>(val a: A?, val b: B?, val c: C?) {
+    operator fun component1(): A = a!!
+    operator fun component2(): B = b!!
+    operator fun component3(): C = c!!
 
     infix fun let(callback: (Nil3<A, B, C>) -> Unit): Nil3<A, B, C> {
         if(listOf(a, b, c).all { it != null }){
@@ -39,9 +40,11 @@ class Nil3<A, B, C>(val a: A, val b: B, val c: C) {
     }
 }
 
-class Nil4<A, B, C, D>(val a: A, val b: B, val c: C, val d: D) {
-    operator fun component1(): A = a
-    operator fun component2(): B = b
+class Nil4<A, B, C, D>(val a: A?, val b: B?, val c: C?, val d: D?) {
+    operator fun component1(): A = a!!
+    operator fun component2(): B = b!!
+    operator fun component3(): C = c!!
+    operator fun component4(): D = d!!
 
     infix fun let(callback: (Nil4<A, B, C, D>) -> Unit): Nil4<A, B, C, D> {
         if(listOf(a, b, c, d).all { it != null }){

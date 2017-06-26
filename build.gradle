@@ -5,7 +5,7 @@ buildscript {
     ext.eggoid_major = 1
     ext.eggoid_minor = 2
     ext.eggoid_bugfix = 4
-    ext.eggoid_codename_suffix = 'test4'
+    ext.eggoid_codename_suffix = '-test5'
 
     repositories {
         jcenter()
