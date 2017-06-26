@@ -10,14 +10,8 @@ To import the library put in your app's module:
 ```gradle
 repositories { 
     maven { 
+        // No more need to set credentials, repo is now public
         url 'https://api.bitbucket.org/1.0/repositories/eggon/eggon-android-library/raw/master/maven-repo' 
-        credentials { 
-            // insert these in your gradle.properties like this:
-            // bitbucket_username=youremail@eggonemail.com
-            // bitbucket_password=yourpassword
-            username bitbucket_username
-            password bitbucket_password
-        } 
     } 
 } 
 dependencies { 
