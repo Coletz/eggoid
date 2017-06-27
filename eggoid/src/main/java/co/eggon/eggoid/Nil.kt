@@ -1,62 +1,38 @@
 package co.eggon.eggoid
 
 
-class Nil<A, B>(val a: A?, val b: B?) {
-    operator fun component1(): A = a!!
-    operator fun component2(): B = b!!
+class Nil<out A, out B>(val a: A?, val b: B?){
+    data class Data2<out A, out B>(val a: A, val b: B)
 
-    infix fun let(callback: (Nil<A, B>) -> Unit): Nil<A, B> {
-        val objs = listOf(a, b)
-        if(objs.all { it != null }){
-            callback(this)
-        }
-        return this
-    }
-
-    infix fun empty(callback: () -> Unit) {
+    infix inline fun <R> let(block: (Data2<A, B>) -> R): R? {
         if(listOf(a, b).all { it != null }){
-            callback()
+            return block(Data2(a!!, b!!))
+        } else {
+            return null
         }
     }
 }
 
-class Nil3<A, B, C>(val a: A?, val b: B?, val c: C?) {
-    operator fun component1(): A = a!!
-    operator fun component2(): B = b!!
-    operator fun component3(): C = c!!
+class Nil3<out A, out B, out C>(val a: A?, val b: B?, val c: C?){
+    data class Data3<out A, out B, out C>(val a: A, val b: B, val c: C)
 
-    infix fun let(callback: (Nil3<A, B, C>) -> Unit): Nil3<A, B, C> {
+    infix inline fun <R> let(block: (Data3<A, B, C>) -> R): R? {
         if(listOf(a, b, c).all { it != null }){
-            callback(this)
-        }
-        return this
-    }
-
-    infix fun empty(callback: () -> Unit) {
-        val objs = listOf(a, b)
-        if(objs.all { it != null }){
-            callback()
+            return block(Data3(a!!, b!!, c!!))
+        } else {
+            return null
         }
     }
 }
 
-class Nil4<A, B, C, D>(val a: A?, val b: B?, val c: C?, val d: D?) {
-    operator fun component1(): A = a!!
-    operator fun component2(): B = b!!
-    operator fun component3(): C = c!!
-    operator fun component4(): D = d!!
+class Nil4<out A, out B, out C, out D>(val a: A?, val b: B?, val c: C?, val d: D?){
+    data class Data4<out A, out B, out C, out D>(val a: A, val b: B, val c: C, val d: D)
 
-    infix fun let(callback: (Nil4<A, B, C, D>) -> Unit): Nil4<A, B, C, D> {
+    infix inline fun <R> let(block: (Data4<A, B, C, D>) -> R): R? {
         if(listOf(a, b, c, d).all { it != null }){
-            callback(this)
-        }
-        return this
-    }
-
-    infix fun empty(callback: () -> Unit) {
-        val objs = listOf(a, b)
-        if(objs.all { it != null }){
-            callback()
+            return block(Data4(a!!, b!!, c!!, d!!))
+        } else {
+            return null
         }
     }
 }
