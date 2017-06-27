@@ -2,6 +2,7 @@ package co.eggon.eggoid.extension
 
 import co.eggon.eggoid.RealmPromise
 import io.realm.*
+import java.util.*
 import kotlin.reflect.KClass
 
 /****************
@@ -74,15 +75,33 @@ fun <E : RealmModel> Realm?.update(list: RealmList<E>): RealmPromise<RealmList<E
 /**
  * Remove all RealmResults from realm using a query
  **/
-fun <E : RealmModel> Realm?.remove(kclass: KClass<E>, criteria: List<Pair<String, String>>, case: Case): RealmPromise<Boolean> {
+fun <E : RealmModel> Realm?.remove(kclass: KClass<E>, criteria: Pair<String, Any>, case: Case = Case.SENSITIVE): RealmPromise<Boolean> {
+    return this.remove(kclass, listOf(criteria), case)
+}
+
+fun <E : RealmModel> Realm?.remove(kclass: KClass<E>, criteria: List<Pair<String, Any>>, case: Case = Case.SENSITIVE): RealmPromise<Boolean> {
     val promise = RealmPromise<Boolean>()
     var deleted = false
     this?.let { realm ->
         if (!realm.isClosed) {
-            realm.executeTransactionAsync(
-                    { realm ->
-                        val query = realm.where(kclass.java)
-                        criteria.forEach { query.equalTo(it.first, it.second, case) }
+            realm.executeTransactionAsync({ asyncRealm ->
+                        val query = asyncRealm.where(kclass.java)
+                        criteria.forEach {
+                            val secondParam = it.second
+                            when(secondParam){
+                                is Date -> query.equalTo(it.first, secondParam)
+                                is Boolean -> query.equalTo(it.first, secondParam)
+                                is Byte -> query.equalTo(it.first, secondParam)
+                                is ByteArray -> query.equalTo(it.first, secondParam)
+                                is Double -> query.equalTo(it.first, secondParam)
+                                is Float -> query.equalTo(it.first, secondParam)
+                                is Int -> query.equalTo(it.first, secondParam)
+                                is Long -> query.equalTo(it.first, secondParam)
+                                is Short -> query.equalTo(it.first, secondParam)
+                                is String -> query.equalTo(it.first, secondParam, case)
+                                else -> throw TypeCastException("Criteria support only primitives")
+                            }
+                        }
                         deleted = query.findAll().deleteAllFromRealm()
                     },
                     { promise.action?.invoke(deleted) },
