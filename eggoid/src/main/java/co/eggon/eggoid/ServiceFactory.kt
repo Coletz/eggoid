@@ -18,7 +18,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
-class ServiceFactory {
+class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? = null, customConnectionTimeout: Long? = null) {
 
     companion object {
         private val MISSING_INIT_MSG = "You must call ServiceFactory.init(\"https://your.url.com\") before using this function!"
@@ -28,14 +28,24 @@ class ServiceFactory {
         private var connectionInterceptor: Boolean = false
         private var tag: String = "OkHttp"
 
+        private var readTimeout = 30L
+        private var writeTimeout = 30L
+        private var connectionTimeout = 30L
+
         private val moduleList: ArrayList<Module>? = ArrayList()
         private var factory: Converter.Factory? = null
 
-        fun init(serverAddress: String, enableInterceptor: Boolean = logInterceptor, customTag: String = tag, converterFactory: Converter.Factory? = ConverterFactory.forJson(), closeConnectionInterceptor: Boolean = connectionInterceptor){
+        fun init(serverAddress: String, enableInterceptor: Boolean = logInterceptor, customTag: String = tag){
             address = serverAddress
             logInterceptor = enableInterceptor
             tag = customTag
+        }
+
+        fun converterFactory(converterFactory: Converter.Factory){
             factory = converterFactory
+        }
+
+        fun connectionInterceptor(closeConnectionInterceptor: Boolean){
             connectionInterceptor = closeConnectionInterceptor
         }
 
@@ -51,6 +61,9 @@ class ServiceFactory {
 
     internal var retrofit: Retrofit? = null
 
+    /**
+     * Constructor initializer
+     **/
     init {
         if(address == null){
 
@@ -59,8 +72,9 @@ class ServiceFactory {
             bodyInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
             val client = OkHttpClient.Builder()
-                    .readTimeout(30, TimeUnit.SECONDS)
-                    .connectTimeout(30, TimeUnit.SECONDS)
+                    .readTimeout(customReadTimeout ?: readTimeout, TimeUnit.SECONDS)
+                    .writeTimeout(customWriteTimeout ?: writeTimeout, TimeUnit.SECONDS)
+                    .connectTimeout(customConnectionTimeout ?: connectionTimeout, TimeUnit.SECONDS)
             if(logInterceptor){
                 client.addInterceptor(bodyInterceptor)
             }
@@ -77,7 +91,7 @@ class ServiceFactory {
                     .client(client.build())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 
-            factory?.let {
+            (factory ?: ConverterFactory.forJson()).let {
                 builder.addConverterFactory(it)
             }
 
