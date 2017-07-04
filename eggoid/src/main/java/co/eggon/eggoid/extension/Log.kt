@@ -1,14 +1,11 @@
 package co.eggon.eggoid.extension
 
+import android.content.Context
+import android.support.annotation.IntDef
 import android.util.Log.*
-import co.eggon.eggoid.RealmPromise
-import io.reactivex.Observable
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import io.realm.*
-import io.realm.exceptions.RealmException
-import java.text.SimpleDateFormat
-import java.util.*
+import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
+import android.widget.Toast.LENGTH_SHORT
 import kotlin.reflect.KClass
 
 fun Any?.wtf(obj: Any = "[ASSERT]") {
@@ -65,5 +62,25 @@ private fun Any?.log(obj: Any? = null, level: Int = ERROR) {
     if (this is Throwable) {
         e(logger, "******** STACK TRACE ********")
         this.printStackTrace()
+    }
+}
+
+@IntDef(LENGTH_SHORT.toLong(), LENGTH_LONG.toLong())
+@Retention(AnnotationRetention.SOURCE)
+annotation class Duration
+
+fun Any?.toast(ctx: Context, @Duration duration: Int = LENGTH_SHORT, isRes: Boolean = false){
+    if(isRes && this is Int){
+        Toast.makeText(ctx, this, duration).show()
+    } else {
+        val message = when (this) {
+            is Enum<*>? -> if (this == null) "NullEnum" else "${this::class.java.simpleName}.${this.name}"
+            is String? -> if (this == null) "NullString" else "String: $this"
+            is Int? -> if (this == null) "NullInt" else "Int: $this"
+            is Float? -> if (this == null) "NullFloat" else "Float: $this"
+            is Double? -> if (this == null) "NullDouble" else "Double: $this"
+            else -> if (this == null) "NullValue" else "Value: $this"
+        }
+        Toast.makeText(ctx, message, duration).show()
     }
 }

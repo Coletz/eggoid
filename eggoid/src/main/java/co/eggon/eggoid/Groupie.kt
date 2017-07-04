@@ -1,12 +1,15 @@
 package co.eggon.eggoid
 
 import android.animation.AnimatorListenerAdapter
+import android.graphics.Color
+import android.graphics.drawable.Drawable
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewPropertyAnimator
 
 class Groupie<T : View>(vararg views: T) {
 
-    val mViews = ArrayList(views.asList())
+    private val mViews = ArrayList(views.asList())
     var mAnimator = Animator()
 
     var visibility: Int = View.VISIBLE
@@ -15,6 +18,18 @@ class Groupie<T : View>(vararg views: T) {
             if (value == View.VISIBLE || value == View.INVISIBLE || value == View.GONE) {
                 mViews.forEach { it.visibility = value }
             }
+        }
+
+    var backgroundColor: Int = Color.WHITE
+        set(value) {
+            field = value
+            mViews.forEach { it.setBackgroundColor(value) }
+        }
+
+    var backgroundRes: Int = 0
+        set(value) {
+            field = value
+            mViews.forEach { it.setBackgroundResource(field) }
         }
 
     var isFocusable: Boolean = true
@@ -27,6 +42,24 @@ class Groupie<T : View>(vararg views: T) {
         set(value) {
             field = value
             mViews.forEach { it.isClickable = value }
+        }
+
+    var layoutParams: ViewGroup.LayoutParams = ViewGroup.LayoutParams(0,0)
+        set(value) {
+            field = value
+            mViews.forEach { it.layoutParams = value }
+        }
+
+    var lpWidth: Int = 0
+        set(value) {
+            field = value
+            mViews.forEach { it.layoutParams.width = value }
+        }
+
+    var lpHeight: Int = 0
+        set(value) {
+            field = value
+            mViews.forEach { it.layoutParams.height= value }
         }
 
     fun setOnClickListener(listener: ((View) -> Unit)?) {
