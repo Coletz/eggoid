@@ -2,6 +2,7 @@ package co.eggon.eggoid
 
 import android.os.Bundle
 import android.support.v4.app.FragmentActivity
+import android.support.v7.app.AppCompatActivity
 import co.eggon.eggoid.extension.create
 import co.eggon.eggoid.extension.debug
 import co.eggon.eggoid.extension.remove
@@ -11,7 +12,7 @@ import io.realm.*
 import io.realm.exceptions.RealmException
 import kotlin.reflect.KClass
 
-open class RealmActivity : FragmentActivity() {
+open class RealmActivity : AppCompatActivity() {
     protected var realm: Realm? = null
     protected var disposables = CompositeDisposable()
     private var realmConfig: RealmConfiguration? = null
