@@ -1,4 +1,4 @@
-![Bitbucket Version](https://img.shields.io/badge/Version-1.1.5-brightgreen.svg)
+![Bitbucket Version](https://img.shields.io/badge/Version-1.2.10-brightgreen.svg)
 
 # What is this repository for?
 
