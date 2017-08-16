@@ -82,7 +82,10 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
 
             if(connectionInterceptor){
                 client.addNetworkInterceptor {
-                    val request = it.request().newBuilder().addHeader("Connection", "close").build()
+                    val request = it.request()
+                    request.headers("Connection").let { headers ->
+                        headers.indices.forEach { headers[it] = "close" }
+                    }
                     it.proceed(request)
                 }
             }
