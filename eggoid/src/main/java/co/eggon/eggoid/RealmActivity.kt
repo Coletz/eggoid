@@ -14,8 +14,9 @@ import kotlin.reflect.KClass
 
 open class RealmActivity : AppCompatActivity() {
     protected var realm: Realm? = null
-    protected var disposables = CompositeDisposable()
     private var realmConfig: RealmConfiguration? = null
+
+    var disposables = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,9 +24,7 @@ open class RealmActivity : AppCompatActivity() {
         open()
     }
 
-    open fun onRealmSetup(): RealmConfiguration? {
-        return null
-    }
+    open fun onRealmSetup(): RealmConfiguration? = null
 
     override fun onDestroy() {
         super.onDestroy()

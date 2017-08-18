@@ -1,6 +1,5 @@
 package co.eggon.eggoid
 
-import co.eggon.eggoid.extension.error
 import co.eggon.eggoid.extension.info
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
