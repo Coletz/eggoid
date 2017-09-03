@@ -11,7 +11,7 @@ import io.realm.exceptions.RealmException
 import kotlin.reflect.KClass
 
 open class RealmFragment : Fragment() {
-    protected var realm: Realm? = null
+    var realm: Realm? = null
     private var realmConfig: RealmConfiguration? = null
 
     var disposables = CompositeDisposable()

@@ -13,7 +13,7 @@ import io.realm.exceptions.RealmException
 import kotlin.reflect.KClass
 
 open class RealmActivity : AppCompatActivity() {
-    protected var realm: Realm? = null
+    var realm: Realm? = null
     private var realmConfig: RealmConfiguration? = null
 
     var disposables = CompositeDisposable()
