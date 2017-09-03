@@ -65,9 +65,7 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
      * Constructor initializer
      **/
     init {
-        if(address == null){
-
-        } else {
+        address?.let {
             val bodyInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> message.info(tag) })
             bodyInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
@@ -80,12 +78,18 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
             }
 
             if(connectionInterceptor){
-                client.addNetworkInterceptor {
+                client.addInterceptor {
                     val request = it.request()
+                    var hasConnectionHeader = false
                     request.headers("Connection").let { headers ->
-                        headers.indices.forEach { headers[it] = "close" }
+                        headers.indices.forEach { headers[it] = "close"; hasConnectionHeader = true }
                     }
-                    it.proceed(request)
+                    if(!hasConnectionHeader){
+                        val newRequest = it.request().newBuilder().addHeader("Connection", "close").build()
+                        it.proceed(newRequest)
+                    } else {
+                        it.proceed(request)
+                    }
                 }
             }
 
@@ -99,15 +103,13 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
             }
 
             retrofit = builder.build()
-        }
+        } ?: throw Exception(MISSING_INIT_MSG)
     }
 
     fun <T : Any> with(clazz: KClass<T>): T {
-        if(address == null){
-            throw Exception(MISSING_INIT_MSG)
-        } else {
-            return retrofit?.create(clazz.java) ?: throw Exception(MISSING_RETROFIT_MSG)
-        }
+        return address?.let {
+            retrofit?.create(clazz.java) ?: throw Exception(MISSING_RETROFIT_MSG)
+        } ?: throw Exception(MISSING_INIT_MSG)
     }
 
     object ConverterFactory {
