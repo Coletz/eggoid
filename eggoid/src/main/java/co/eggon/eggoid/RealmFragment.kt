@@ -5,13 +5,16 @@ import co.eggon.eggoid.extension.create
 import co.eggon.eggoid.extension.debug
 import co.eggon.eggoid.extension.remove
 import co.eggon.eggoid.extension.update
+import io.reactivex.disposables.CompositeDisposable
 import io.realm.*
 import io.realm.exceptions.RealmException
 import kotlin.reflect.KClass
 
 open class RealmFragment : Fragment() {
-    protected var realm: Realm? = null
+    var realm: Realm? = null
     private var realmConfig: RealmConfiguration? = null
+
+    var disposables = CompositeDisposable()
 
     override fun onStart() {
         super.onStart()
@@ -19,12 +22,11 @@ open class RealmFragment : Fragment() {
         open()
     }
 
-    open fun onRealmSetup(): RealmConfiguration? {
-        return null
-    }
+    open fun onRealmSetup(): RealmConfiguration? = null
 
     override fun onStop() {
         super.onStop()
+        disposables.clear()
         close()
     }
 

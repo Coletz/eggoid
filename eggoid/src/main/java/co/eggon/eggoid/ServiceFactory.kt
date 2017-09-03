@@ -1,6 +1,6 @@
 package co.eggon.eggoid
 
-import co.eggon.eggoid.extension.error
+import co.eggon.eggoid.extension.info
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.Module
@@ -59,7 +59,7 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
         }
     }
 
-    internal var retrofit: Retrofit? = null
+    private var retrofit: Retrofit? = null
 
     /**
      * Constructor initializer
@@ -68,7 +68,7 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
         if(address == null){
 
         } else {
-            val bodyInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> message.error(tag) })
+            val bodyInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> message.info(tag) })
             bodyInterceptor.level = HttpLoggingInterceptor.Level.BODY
 
             val client = OkHttpClient.Builder()
@@ -81,7 +81,10 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
 
             if(connectionInterceptor){
                 client.addNetworkInterceptor {
-                    val request = it.request().newBuilder().addHeader("Connection", "close").build()
+                    val request = it.request()
+                    request.headers("Connection").let { headers ->
+                        headers.indices.forEach { headers[it] = "close" }
+                    }
                     it.proceed(request)
                 }
             }
