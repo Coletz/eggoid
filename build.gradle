@@ -3,8 +3,8 @@
 buildscript {
     ext.kotlin_version = '1.1.4-3'
     ext.eggoid_major = 1
-    ext.eggoid_minor = 3
-    ext.eggoid_bugfix = 2
+    ext.eggoid_minor = 4
+    ext.eggoid_bugfix = 0
     ext.eggoid_codename_suffix = ''
 
     repositories {
