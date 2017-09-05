@@ -1,0 +1,7 @@
+read -p "Have you updated the library version? " -n 1 -r
+echo
+if [[ $REPLY =~ ^[Yy]$ ]]; then
+    ./gradlew clean build publish
+else
+    echo "Operation stopped."
+fi

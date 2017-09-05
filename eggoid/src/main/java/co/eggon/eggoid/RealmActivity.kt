@@ -145,7 +145,7 @@ open class RealmActivity : AppCompatActivity() {
     fun showLoadingDialog(msg: String? = null): AlertDialog? {
         if (!isFinishing) {
             val dialoglayout = layoutInflater.inflate(R.layout.realm_activity_loading_dialog, null)
-            dialoglayout.findViewById<Button>(R.id.realm_activity_loading_message).text = msg ?: getString(R.string.realm_activity_error)
+            dialoglayout.findViewById<TextView>(R.id.realm_activity_loading_message).text = msg ?: getString(R.string.realm_activity_error)
 
             loadingDialog = AlertDialog.Builder(this)
                     .setTitle(R.string.realm_activity_error)
