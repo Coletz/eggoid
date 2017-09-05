@@ -139,16 +139,20 @@ open class RealmActivity : AppCompatActivity() {
         return null
     }
 
-    fun showLoadingDialog(@StringRes msg: Int): AlertDialog? =
-        showLoadingDialog(getString(msg))
+    fun showLoadingDialog(@StringRes msg: Int, @StringRes title: Int? = null): AlertDialog? =
+        title?.let {
+            getString(it)
+        }.let {
+            showLoadingDialog(getString(msg), it)
+        }
 
-    fun showLoadingDialog(msg: String? = null): AlertDialog? {
+    fun showLoadingDialog(msg: String? = null, title: String? = null): AlertDialog? {
         if (!isFinishing) {
             val dialoglayout = layoutInflater.inflate(R.layout.realm_activity_loading_dialog, null)
-            dialoglayout.findViewById<TextView>(R.id.realm_activity_loading_message).text = msg ?: getString(R.string.realm_activity_error)
+            dialoglayout.findViewById<TextView>(R.id.realm_activity_loading_message).text = msg ?: getString(R.string.realm_activity_loading)
 
             loadingDialog = AlertDialog.Builder(this)
-                    .setTitle(R.string.realm_activity_error)
+                    .setTitle(title ?: getString(R.string.realm_activity_error))
                     .setView(dialoglayout)
                     .setCancelable(false)
                     .show()
@@ -158,14 +162,10 @@ open class RealmActivity : AppCompatActivity() {
     }
 
     fun dismissLoadingDialog(){
-        if(loadingDialog?.isShowing == true){
-            loadingDialog?.dismiss()
-        }
+        loadingDialog?.dismiss()
     }
 
     fun dismissErrorDialog(){
-        if(errorDialog?.isShowing == true){
-            errorDialog?.dismiss()
-        }
+        errorDialog?.dismiss()
     }
 }

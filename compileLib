@@ -3,5 +3,5 @@ echo
 if [[ $REPLY =~ ^[Yy]$ ]]; then
     ./gradlew clean build publish
 else
-    echo "Operation stopped."
+    echo "Operation aborted."
 fi
