@@ -152,7 +152,7 @@ open class RealmActivity : AppCompatActivity() {
             dialoglayout.findViewById<TextView>(R.id.realm_activity_loading_message).text = msg ?: getString(R.string.realm_activity_loading)
 
             loadingDialog = AlertDialog.Builder(this)
-                    .setTitle(title ?: getString(R.string.realm_activity_error))
+                    .setTitle(title ?: getString(R.string.realm_activity_loading))
                     .setView(dialoglayout)
                     .setCancelable(false)
                     .show()
