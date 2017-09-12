@@ -3,9 +3,9 @@
 buildscript {
     ext.kotlin_version = '1.1.4-3'
     ext.eggoid_major = 1
-    ext.eggoid_minor = 4
-    ext.eggoid_bugfix = 1
-    ext.eggoid_codename_suffix = '-alpha3'
+    ext.eggoid_minor = 5
+    ext.eggoid_bugfix = 0
+    ext.eggoid_codename_suffix = ''
 
     repositories {
         jcenter()
