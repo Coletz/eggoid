@@ -21,7 +21,6 @@ local.*
 ## Gradle
 .gradle
 gradle-app.setting
-gradle/
 build/
 gradle.properties
 
