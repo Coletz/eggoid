@@ -60,8 +60,3 @@ repositories {
         url "https://maven.google.com"
     }
 }
-
-//noinspection GroovyAssignabilityCheck
-apply plugin: 'maven-publish'
-//noinspection GroovyAssignabilityCheck
-apply from: '../deploy.gradle'
