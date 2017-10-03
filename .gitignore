@@ -19,8 +19,6 @@ local.*
 *.credentials
 
 ## Gradle
-gradlew*
-gradlew
 .gradle
 gradle-app.setting
 gradle/
