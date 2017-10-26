@@ -1,4 +1,4 @@
-![Bitbucket Version](https://img.shields.io/badge/Version-1.6.1-brightgreen.svg)
+![Bitbucket Version](https://img.shields.io/badge/Version-1.7.0-brightgreen.svg)
 
 # What is this repository for?
 
@@ -14,7 +14,7 @@ repositories {
     } 
 } 
 dependencies { 
-    compile 'com.github.coletz:eggoid:1.6.1'
+    compile 'com.github.coletz:eggoid:1.7.0'
 }
 ```
 
