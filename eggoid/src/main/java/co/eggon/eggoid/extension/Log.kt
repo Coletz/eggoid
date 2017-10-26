@@ -6,6 +6,7 @@ import android.util.Log.*
 import android.widget.Toast
 import android.widget.Toast.LENGTH_LONG
 import android.widget.Toast.LENGTH_SHORT
+import java.nio.charset.Charset
 import kotlin.reflect.KClass
 
 fun Any?.wtf(obj: Any = "[ASSERT]") {
@@ -47,6 +48,7 @@ private fun Any?.log(obj: Any? = null, level: Int = ERROR) {
         is Int? -> if (this == null) "NullInt" else "Int: $this"
         is Float? -> if (this == null) "NullFloat" else "Float: $this"
         is Double? -> if (this == null) "NullDouble" else "Double: $this"
+        is ByteArray? -> if (this == null) "NullByteArray" else "ByteArray: ${this.toString(Charset.forName("UTF-8"))}"
         else -> if (this == null) "NullValue" else "Value: $this"
     }
 
@@ -69,18 +71,39 @@ private fun Any?.log(obj: Any? = null, level: Int = ERROR) {
 @Retention(AnnotationRetention.SOURCE)
 annotation class Duration
 
-fun Any?.toast(ctx: Context, @Duration duration: Int = LENGTH_SHORT, isRes: Boolean = false){
-    if(isRes && this is Int){
-        Toast.makeText(ctx, this, duration).show()
-    } else {
-        val message = when (this) {
-            is Enum<*>? -> if (this == null) "NullEnum" else "${this::class.java.simpleName}.${this.name}"
-            is String? -> if (this == null) "NullString" else "String: $this"
-            is Int? -> if (this == null) "NullInt" else "Int: $this"
-            is Float? -> if (this == null) "NullFloat" else "Float: $this"
-            is Double? -> if (this == null) "NullDouble" else "Double: $this"
-            else -> if (this == null) "NullValue" else "Value: $this"
+fun Any?.toastDbg(context: Context?, @Duration duration: Int = LENGTH_SHORT, isRes: Boolean = false){
+    context?.let { ctx ->
+        if(isRes && this is Int){
+            Toast.makeText(ctx, this, duration).show()
+        } else {
+            val message = when (this) {
+                is Enum<*>? -> if (this == null) "NullEnum" else "${this::class.java.simpleName}.${this.name}"
+                is String? -> if (this == null) "NullString" else "String: $this"
+                is Int? -> if (this == null) "NullInt" else "Int: $this"
+                is Float? -> if (this == null) "NullFloat" else "Float: $this"
+                is Double? -> if (this == null) "NullDouble" else "Double: $this"
+                is ByteArray? -> if (this == null) "NullByteArray" else "ByteArray: ${this.toString(Charset.forName("UTF-8"))}"
+                else -> if (this == null) "NullValue" else "Value: $this"
+            }
+            Toast.makeText(ctx, message, duration).show()
         }
-        Toast.makeText(ctx, message, duration).show()
+    }
+}
+
+fun Any?.toast(context: Context?, @Duration duration: Int = LENGTH_SHORT, isRes: Boolean = false){
+    context?.let { ctx ->
+        if(isRes && this is Int){
+            Toast.makeText(ctx, this, duration).show()
+        } else {
+            val message = when (this) {
+                null -> "Null"
+                is Enum<*>? -> "${this::class.java.simpleName}.${this.name}"
+                is ByteArray? -> this.toString(Charset.forName("UTF-8"))
+                else -> this.toString()
+            }
+            Toast.makeText(ctx, message, duration).show()
+        }
+    } ?: run {
+        "Toast not displayed, context is null".error()
     }
 }
