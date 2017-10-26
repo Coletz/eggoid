@@ -10,12 +10,11 @@ To import the library put in your app's module:
 ```gradle
 repositories { 
     maven { 
-        // No more need to set credentials, repo is now public
-        url 'https://api.bitbucket.org/1.0/repositories/eggon/eggon-android-library/raw/master/maven-repo' 
+        url 'https://jitpack.io' 
     } 
 } 
 dependencies { 
-    compile 'co.eggon:eggoid:<see latest version in README>'
+    compile 'com.github.coletz:eggoid:1.5.0'
 }
 ```
 
