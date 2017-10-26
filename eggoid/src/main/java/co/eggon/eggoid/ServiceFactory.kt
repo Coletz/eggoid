@@ -8,12 +8,15 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector
 import com.fasterxml.jackson.databind.module.SimpleModule
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import io.realm.RealmObject
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
+import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.jackson.JacksonConverterFactory
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
@@ -55,7 +58,7 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
 
         fun addModule(vararg module: SimpleModule){
             module.forEach { moduleList?.add(it) }
-            factory = ConverterFactory.forJson()
+            factory = ConverterFactory.forJackson()
         }
     }
 
@@ -94,11 +97,11 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
             }
 
             val builder = Retrofit.Builder()
-                    .baseUrl(address)
+                    .baseUrl(it)
                     .client(client.build())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 
-            (factory ?: ConverterFactory.forJson()).let {
+            (factory ?: ConverterFactory.forGson()).let {
                 builder.addConverterFactory(it)
             }
 
@@ -113,7 +116,7 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
     }
 
     object ConverterFactory {
-        fun forJson(): Converter.Factory {
+        fun forJackson(): Converter.Factory {
             val mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             moduleList?.forEach {
                 mapper.registerModule(it)
@@ -127,6 +130,11 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
                 }
             })
             return JacksonConverterFactory.create(mapper)
+        }
+
+        fun forGson(): Converter.Factory {
+            val gson = GsonBuilder()
+            return GsonConverterFactory.create(gson.create())
         }
     }
 }

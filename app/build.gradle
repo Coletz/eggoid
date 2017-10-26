@@ -4,13 +4,13 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    compileSdkVersion sdk_version
+    buildToolsVersion build_tools_version
 
     defaultConfig {
         applicationId "co.eggon.eggoid"
         minSdkVersion 16
-        targetSdkVersion 26
+        targetSdkVersion sdk_version
         versionCode 110
         versionName "1.1.0"
     }
@@ -38,14 +38,12 @@ dependencies {
 
     // Support
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
-    compile 'com.android.support:appcompat-v7:26.0.1'
+    compile "com.android.support:appcompat-v7:$support_version"
 
     // Kotlin
     compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 }
 
 repositories {
-    maven {
-        url "https://maven.google.com"
-    }
+    google()
 }

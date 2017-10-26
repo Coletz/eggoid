@@ -37,12 +37,12 @@ open class RealmFragment : Fragment() {
     }
 
     private fun open() {
-        if (realmConfig != null) {
-            "Loading custom realm file: ${realmConfig!!.realmFileName}".debug()
-            realm = Realm.getInstance(realmConfig)
-        } else {
+        realm = realmConfig?.let {
+            "Loading custom realm file: ${it.realmFileName}".debug()
+            Realm.getInstance(it)
+        } ?: run {
             "Loading default.realm".debug()
-            realm = Realm.getDefaultInstance()
+            Realm.getDefaultInstance()
         }
     }
 

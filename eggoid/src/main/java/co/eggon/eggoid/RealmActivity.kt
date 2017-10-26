@@ -62,7 +62,7 @@ open class RealmActivity : AppCompatActivity() {
     private fun open() {
         realm = realmConfig?.let {
             "Loading custom realm file: ${it.realmFileName}".debug()
-            Realm.getInstance(realmConfig)
+            Realm.getInstance(it)
         } ?: run {
             "Loading default.realm".debug()
             Realm.getDefaultInstance()
