@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.module.SimpleModule
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.realm.RealmObject
+import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Converter
@@ -28,7 +29,8 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
         private val MISSING_RETROFIT_MSG = "You must create a ServiceFactory before using it!"
         private var address: String? = null
         private var logInterceptor: Boolean = false
-        private var connectionInterceptor: Boolean = false
+        private var interceptors: ArrayList<Interceptor> = arrayListOf()
+        private var networkInterceptors: ArrayList<Interceptor> = arrayListOf()
         private var tag: String = "OkHttp"
 
         private var readTimeout = 30L
@@ -48,8 +50,12 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
             factory = converterFactory
         }
 
-        fun connectionInterceptor(closeConnectionInterceptor: Boolean){
-            connectionInterceptor = closeConnectionInterceptor
+        fun addInterceptor(interceptor: Interceptor){
+            interceptors.add(interceptor)
+        }
+
+        fun addNetworkInterceptor(interceptor: Interceptor){
+            networkInterceptors.add(interceptor)
         }
 
         /**
@@ -69,31 +75,22 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
      **/
     init {
         address?.let {
-            val bodyInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> message.info(tag) })
-            bodyInterceptor.level = HttpLoggingInterceptor.Level.BODY
-
             val client = OkHttpClient.Builder()
                     .readTimeout(customReadTimeout ?: readTimeout, TimeUnit.SECONDS)
                     .writeTimeout(customWriteTimeout ?: writeTimeout, TimeUnit.SECONDS)
                     .connectTimeout(customConnectionTimeout ?: connectionTimeout, TimeUnit.SECONDS)
             if(logInterceptor){
+                val bodyInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> message.info(tag) })
+                bodyInterceptor.level = HttpLoggingInterceptor.Level.BODY
                 client.addInterceptor(bodyInterceptor)
             }
 
-            if(connectionInterceptor){
-                client.addInterceptor {
-                    val request = it.request()
-                    var hasConnectionHeader = false
-                    request.headers("Connection").let { headers ->
-                        headers.indices.forEach { headers[it] = "close"; hasConnectionHeader = true }
-                    }
-                    if(!hasConnectionHeader){
-                        val newRequest = it.request().newBuilder().addHeader("Connection", "close").build()
-                        it.proceed(newRequest)
-                    } else {
-                        it.proceed(request)
-                    }
-                }
+            interceptors.forEach {
+                client.addInterceptor(it)
+            }
+
+            networkInterceptors.forEach {
+                client.addNetworkInterceptor(it)
             }
 
             val builder = Retrofit.Builder()
