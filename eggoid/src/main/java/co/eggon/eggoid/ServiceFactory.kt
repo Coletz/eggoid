@@ -98,7 +98,7 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
                     .client(client.build())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 
-            (factory ?: ConverterFactory.forGson()).let {
+            (factory ?: ConverterFactory.forJackson()).let {
                 builder.addConverterFactory(it)
             }
 
