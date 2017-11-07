@@ -22,7 +22,7 @@ import retrofit2.converter.jackson.JacksonConverterFactory
 import java.util.concurrent.TimeUnit
 import kotlin.reflect.KClass
 
-class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? = null, customConnectionTimeout: Long? = null) {
+class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? = null, customConnectionTimeout: Long? = null, retryOnConnectionFail: Boolean = false) {
 
     companion object {
         private val MISSING_INIT_MSG = "You must call ServiceFactory.init(\"https://your.url.com\") before using this function!"
@@ -76,9 +76,10 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
     init {
         address?.let {
             val client = OkHttpClient.Builder()
-                    .readTimeout(customReadTimeout ?: readTimeout, TimeUnit.SECONDS)
-                    .writeTimeout(customWriteTimeout ?: writeTimeout, TimeUnit.SECONDS)
-                    .connectTimeout(customConnectionTimeout ?: connectionTimeout, TimeUnit.SECONDS)
+                .readTimeout(customReadTimeout ?: readTimeout, TimeUnit.SECONDS)
+                .writeTimeout(customWriteTimeout ?: writeTimeout, TimeUnit.SECONDS)
+                .connectTimeout(customConnectionTimeout ?: connectionTimeout, TimeUnit.SECONDS)
+                .retryOnConnectionFailure(true)
             if(logInterceptor){
                 val bodyInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> message.info(tag) })
                 bodyInterceptor.level = HttpLoggingInterceptor.Level.BODY
