@@ -42,23 +42,29 @@ private fun Any?.log(obj: Any? = null, level: Int = ERROR) {
         else -> obj.javaClass.simpleName
     }
 
-    val message = when (this) {
-        is Enum<*>? -> if (this == null) "NullEnum" else "${this::class.java.simpleName}.${this.name}"
-        is String? -> if (this == null) "NullString" else "String: $this"
-        is Int? -> if (this == null) "NullInt" else "Int: $this"
-        is Float? -> if (this == null) "NullFloat" else "Float: $this"
-        is Double? -> if (this == null) "NullDouble" else "Double: $this"
-        is ByteArray? -> if (this == null) "NullByteArray" else "ByteArray: ${this.toString(Charset.forName("UTF-8"))}"
-        else -> if (this == null) "NullValue" else "Value: $this"
-    }
+    if(this is Collection<*>){
+        this.forEach { message ->
+            message.log(obj, level)
+        }
+    } else {
+        val message = when (this) {
+            is Enum<*>? -> if (this == null) "NullEnum" else "${this::class.java.simpleName}.${this.name}"
+            is String? -> if (this == null) "NullString" else "String: $this"
+            is Int? -> if (this == null) "NullInt" else "Int: $this"
+            is Float? -> if (this == null) "NullFloat" else "Float: $this"
+            is Double? -> if (this == null) "NullDouble" else "Double: $this"
+            is ByteArray? -> if (this == null) "NullByteArray" else "ByteArray: ${this.toString(Charset.forName("UTF-8"))}"
+            else -> if (this == null) "NullValue" else "Value: $this"
+        }
 
-    when (level) {
-        VERBOSE -> v(logger, message)
-        DEBUG -> d(logger, message)
-        INFO -> i(logger, message)
-        WARN -> w(logger, message)
-        ERROR -> e(logger, message)
-        else -> wtf(logger, message)
+        when (level) {
+            VERBOSE -> v(logger, message)
+            DEBUG -> d(logger, message)
+            INFO -> i(logger, message)
+            WARN -> w(logger, message)
+            ERROR -> e(logger, message)
+            else -> wtf(logger, message)
+        }
     }
 
     if (this is Throwable) {
