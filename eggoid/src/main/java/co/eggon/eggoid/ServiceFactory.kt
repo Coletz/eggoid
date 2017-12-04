@@ -31,6 +31,7 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
         private var logInterceptor: Boolean = false
         private var interceptors: ArrayList<Interceptor> = arrayListOf()
         private var networkInterceptors: ArrayList<Interceptor> = arrayListOf()
+        private var factories: ArrayList<Converter.Factory> = arrayListOf()
         private var tag: String = "OkHttp"
 
         private var readTimeout = 30L
@@ -38,16 +39,11 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
         private var connectionTimeout = 30L
 
         private val moduleList: ArrayList<Module>? = ArrayList()
-        private var factory: Converter.Factory? = null
 
         fun init(serverAddress: String, enableInterceptor: Boolean = logInterceptor, customTag: String = tag){
             address = serverAddress
             logInterceptor = enableInterceptor
             tag = customTag
-        }
-
-        fun converterFactory(converterFactory: Converter.Factory){
-            factory = converterFactory
         }
 
         fun addInterceptor(interceptor: Interceptor){
@@ -58,13 +54,16 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
             networkInterceptors.add(interceptor)
         }
 
+        fun addConverterFactory(factory: Converter.Factory){
+            factories.add(factory)
+        }
+
         /**
          * This will automatically set the factory to JacksonConverterFactory
          **/
 
         fun addModule(vararg module: SimpleModule){
             module.forEach { moduleList?.add(it) }
-            factory = ConverterFactory.forJackson()
         }
     }
 
@@ -99,7 +98,7 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
                     .client(client.build())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 
-            (factory ?: ConverterFactory.forJackson()).let {
+            factories.forEach {
                 builder.addConverterFactory(it)
             }
 
@@ -114,19 +113,21 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
     }
 
     object ConverterFactory {
-        fun forJackson(): Converter.Factory {
+        fun forJackson(withRealm: Boolean = true): Converter.Factory {
             val mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             moduleList?.forEach {
                 mapper.registerModule(it)
             }
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
-            mapper.setAnnotationIntrospector(object : JacksonAnnotationIntrospector() {
-                override fun isIgnorableType(ac: AnnotatedClass?): Boolean? {
-                    if (ac?.rawType == RealmObject::class.java)
-                        return true
-                    return super.isIgnorableType(ac)
-                }
-            })
+            if(withRealm){
+                mapper.setAnnotationIntrospector(object : JacksonAnnotationIntrospector() {
+                    override fun isIgnorableType(ac: AnnotatedClass?): Boolean? {
+                        if (ac?.rawType == RealmObject::class.java)
+                            return true
+                        return super.isIgnorableType(ac)
+                    }
+                })
+            }
             return JacksonConverterFactory.create(mapper)
         }
 
