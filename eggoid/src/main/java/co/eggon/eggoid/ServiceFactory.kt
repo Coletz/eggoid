@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.Module
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.PropertyNamingStrategy
 import com.fasterxml.jackson.databind.introspect.AnnotatedClass
 import com.fasterxml.jackson.databind.introspect.JacksonAnnotationIntrospector
 import com.fasterxml.jackson.databind.module.SimpleModule
@@ -49,23 +50,23 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
         }
 
         fun addInterceptor(interceptor: Interceptor){
+            "addInterceptor".debug(TAG)
             interceptors.add(interceptor)
         }
 
         fun addNetworkInterceptor(interceptor: Interceptor){
+            "addNetworkInterceptor".debug(TAG)
             networkInterceptors.add(interceptor)
         }
 
         fun addConverterFactory(factory: Converter.Factory){
+            "addConverterFactory".debug(TAG)
             factories.add(factory)
         }
 
-        /**
-         * This will automatically set the factory to JacksonConverterFactory
-         **/
-
-        fun addModule(vararg module: SimpleModule){
-            module.forEach { jacksonModules?.add(it) }
+        fun addModule(module: SimpleModule){
+            "addModule $module".debug(TAG)
+            jacksonModules.add(module)
         }
     }
 
@@ -120,13 +121,14 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
     }
 
     object ConverterFactory {
-        fun forJackson(withRealm: Boolean = true): Converter.Factory {
+        fun forJackson(withRealm: Boolean = true, case: PropertyNamingStrategy? = null): Converter.Factory {
             val mapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             "Jackson modules: ${jacksonModules.size}".debug(TAG)
             jacksonModules.forEach {
                 mapper.registerModule(it)
             }
             mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL)
+            case?.let { mapper.propertyNamingStrategy = it }
             if(withRealm){
                 mapper.setAnnotationIntrospector(object : JacksonAnnotationIntrospector() {
                     override fun isIgnorableType(ac: AnnotatedClass?): Boolean? {
