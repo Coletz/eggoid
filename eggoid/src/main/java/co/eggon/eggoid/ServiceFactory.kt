@@ -21,6 +21,8 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.converter.jackson.JacksonConverterFactory
 import java.util.concurrent.TimeUnit
+import javax.net.ssl.SSLSocketFactory
+import javax.net.ssl.X509TrustManager
 import kotlin.reflect.KClass
 
 class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? = null, customConnectionTimeout: Long? = null, retryOnConnectionFail: Boolean = false) {
@@ -31,7 +33,7 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
         private val MISSING_INIT_MSG = "You must call ServiceFactory.init(\"https://your.url.com\") before using this function!"
         private val MISSING_RETROFIT_MSG = "You must create a ServiceFactory before using it!"
         private var address: String? = null
-        private var logInterceptor: Boolean = false
+
         private var interceptors: ArrayList<Interceptor> = arrayListOf()
         private var networkInterceptors: ArrayList<Interceptor> = arrayListOf()
         private var factories: ArrayList<Converter.Factory> = arrayListOf()
@@ -40,6 +42,9 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
         private var readTimeout = 30L
         private var writeTimeout = 30L
         private var connectionTimeout = 30L
+
+        private var logInterceptor: Boolean = false
+        private var sslCert: Pair<SSLSocketFactory, X509TrustManager>? = null
 
         private val jacksonModules: ArrayList<Module> = ArrayList()
 
@@ -68,6 +73,10 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
             "addModule $module".debug(TAG)
             jacksonModules.add(module)
         }
+
+        fun sslCertificate(cert: Pair<SSLSocketFactory, X509TrustManager>){
+            sslCert = cert
+        }
     }
 
     private var retrofit: Retrofit? = null
@@ -88,6 +97,9 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
                 val bodyInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> message.info(tag) })
                 bodyInterceptor.level = HttpLoggingInterceptor.Level.BODY
                 client.addInterceptor(bodyInterceptor)
+            }
+            sslCert?.let {
+                client.sslSocketFactory(it.first, it.second)
             }
 
             "Additional interceptors: ${interceptors.size}".debug(TAG)
