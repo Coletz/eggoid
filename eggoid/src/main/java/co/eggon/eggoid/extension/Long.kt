@@ -1,5 +1,10 @@
 package co.eggon.eggoid.extension
 
-/**
- * Created by androidd on 21/12/17.
- */
+import android.content.Context
+import android.util.DisplayMetrics
+
+fun Float.dpToPx(context: Context): Float =
+        this * (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
+
+fun Float.pxToDp(context: Context): Float =
+        this / (context.resources.displayMetrics.densityDpi.toFloat() / DisplayMetrics.DENSITY_DEFAULT)
