@@ -3,7 +3,7 @@
 buildscript {
     ext.eggoid_major = 1
     ext.eggoid_minor = 9
-    ext.eggoid_bugfix = 0
+    ext.eggoid_bugfix = 1
     ext.eggoid_codename_suffix = ''
 
     ext.kotlin_version = '1.2.0'
