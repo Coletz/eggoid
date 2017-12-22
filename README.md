@@ -14,7 +14,7 @@ repositories {
     } 
 } 
 dependencies { 
-    compile 'com.github.coletz:eggoid:1.7.0'
+    compile 'com.github.coletz:eggoid:1.9.1'
 }
 ```
 
