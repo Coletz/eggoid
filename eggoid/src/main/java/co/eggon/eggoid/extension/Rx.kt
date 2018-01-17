@@ -2,6 +2,7 @@ package co.eggon.eggoid.extension
 
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
@@ -12,7 +13,7 @@ import okhttp3.RequestBody
 /**
  * Observable utilities
  **/
-fun <T> Observable<T>.network(onNext: Consumer<T>, onError: Consumer<Throwable>, onComplete: Action? = null, onSubscribe: Consumer<Disposable>? = null): Disposable {
+fun <T> Observable<T>.network(bag: CompositeDisposable, onNext: Consumer<T>, onError: Consumer<Throwable>, onComplete: Action? = null, onSubscribe: Consumer<Disposable>? = null): Disposable {
     return onUi().async().let {
         onSubscribe?.let {
             subscribe(onNext, onError, onComplete, it)
@@ -20,11 +21,11 @@ fun <T> Observable<T>.network(onNext: Consumer<T>, onError: Consumer<Throwable>,
             subscribe(onNext, onError, it)
         } ?: run {
             subscribe(onNext, onError)
-        }
+        }.also { bag.add(it) }
     }
 }
 
-fun <T> Observable<T>.network(onNext: ((T) -> Unit), onError: ((Throwable) -> Unit), onComplete: (() -> Unit)? = null, onSubscribe: ((Disposable) -> Unit)? = null): Disposable {
+fun <T> Observable<T>.network(bag: CompositeDisposable, onNext: ((T) -> Unit), onError: ((Throwable) -> Unit), onComplete: (() -> Unit)? = null, onSubscribe: ((Disposable) -> Unit)? = null): Disposable {
     return onUi().async().let { obs ->
         onSubscribe?.let {
             obs.subscribe(onNext, onError, onComplete, it)
@@ -32,7 +33,7 @@ fun <T> Observable<T>.network(onNext: ((T) -> Unit), onError: ((Throwable) -> Un
             obs.subscribe(onNext, onError, it)
         } ?: run {
             obs.subscribe(onNext, onError)
-        }
+        }.also { bag.add(it) }
     }
 }
 

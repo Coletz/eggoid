@@ -5,15 +5,14 @@ import co.eggon.eggoid.DataWrapper
 import co.eggon.eggoid.RealmPromise
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.realm.*
 import io.realm.exceptions.RealmException
 
 @Throws(RealmException::class)
-fun <E : RealmModel> Observable<E>.objectToRealm(realm: Realm?, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
+fun <E : RealmModel> Observable<E>.objectToRealm(realm: Realm?, bag: CompositeDisposable, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
     val promise = RealmPromise<E>()
-    this.subscribeOn(io.reactivex.schedulers.Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({
+    this.network(bag, {
                 if (update) {
                     beforeSave?.invoke(it)
                     realm.update(it)
@@ -29,11 +28,9 @@ fun <E : RealmModel> Observable<E>.objectToRealm(realm: Realm?, update: Boolean 
 }
 
 @Throws(RealmException::class)
-fun <E : RealmList<out RealmModel>> Observable<E>.listToRealm(realm: Realm?, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
+fun <E : RealmList<out RealmModel>> Observable<E>.listToRealm(realm: Realm?, bag: CompositeDisposable, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
     val promise = RealmPromise<E>()
-    this.subscribeOn(io.reactivex.schedulers.Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ list ->
+    this.network(bag, { list ->
                 if (update) {
                     beforeSave?.invoke(list)
                     realm.update(list)
@@ -59,11 +56,9 @@ fun <E : RealmList<out RealmModel>> Observable<E>.listToRealm(realm: Realm?, upd
  * }
  */
 @Throws(RealmException::class)
-fun <E : DataWrapper<out RealmModel>> Observable<E>.wrappedToRealm(realm: Realm?, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
+fun <E : DataWrapper<out RealmModel>> Observable<E>.wrappedToRealm(realm: Realm?, bag: CompositeDisposable, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
     val promise = RealmPromise<E>()
-    this.subscribeOn(io.reactivex.schedulers.Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ wrapper ->
+    this.network(bag, { wrapper ->
                 if (update) {
                     beforeSave?.invoke(wrapper)
                     wrapper.data?.let { data ->
@@ -95,20 +90,18 @@ fun <E : DataWrapper<out RealmModel>> Observable<E>.wrappedToRealm(realm: Realm?
  * }
  */
 @Throws(RealmException::class)
-fun <E : DataListWrapper<out RealmModel>> Observable<E>.wrappedListToRealm(realm: Realm?, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
+fun <E : DataListWrapper<out RealmModel>> Observable<E>.wrappedListToRealm(realm: Realm?, bag: CompositeDisposable, update: Boolean = true, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
     val promise = RealmPromise<E>()
-    this.subscribeOn(io.reactivex.schedulers.Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ wrapper ->
+    this.network(bag, { wrapper ->
                 if (update) {
                     beforeSave?.invoke(wrapper)
-                    wrapper?.data?.let {
+                    wrapper.data?.let {
                         realm.update(it)
                                 .then { promise.action?.invoke(wrapper) }
                                 .onError { promise.error?.invoke(it) ?: throw it }
                     }
                 } else {
-                    wrapper?.data?.let {
+                    wrapper.data?.let {
                         realm.create(it)
                                 .then { promise.action?.invoke(wrapper) }
                                 .onError { promise.error?.invoke(it) ?: throw it }

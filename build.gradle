@@ -2,13 +2,13 @@
 
 buildscript {
     ext.eggoid_major = 1
-    ext.eggoid_minor = 9
-    ext.eggoid_bugfix = 1
+    ext.eggoid_minor = 10
+    ext.eggoid_bugfix = 0
     ext.eggoid_codename_suffix = ''
 
-    ext.kotlin_version = '1.2.0'
+    ext.kotlin_version = '1.2.10'
 
-    ext.support_version = '27.0.1'
+    ext.support_version = '27.0.2'
     ext.build_tools_version = '27.0.1'
     ext.sdk_version = 27
 
