@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Eggoid</string>
+    <string name="app_name" translatable="false">Eggoid</string>
     <string name="realm_activity_ok">OK</string>
     <string name="realm_activity_error">Error</string>
     <string name="realm_activity_loading">Loading…</string>
