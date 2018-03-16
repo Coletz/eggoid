@@ -25,18 +25,15 @@ import javax.net.ssl.SSLSocketFactory
 import javax.net.ssl.X509TrustManager
 import kotlin.reflect.KClass
 
-class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? = null, customConnectionTimeout: Long? = null, retryOnConnectionFail: Boolean = false) {
+class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? = null, customConnectionTimeout: Long? = null) {
 
     companion object {
-        private val TAG = "ServiceFactory"
+        private const val TAG = "ServiceFactory"
 
-        private val MISSING_INIT_MSG = "You must call ServiceFactory.init(\"https://your.url.com\") before using this function!"
-        private val MISSING_RETROFIT_MSG = "You must create a ServiceFactory before using it!"
+        private const val MISSING_INIT_MSG = "You must call ServiceFactory.init(\"https://your.url.com\") before using this function!"
+        private const val MISSING_RETROFIT_MSG = "You must create a ServiceFactory before using it!"
         private var address: String? = null
 
-        private var interceptors: ArrayList<Interceptor> = arrayListOf()
-        private var networkInterceptors: ArrayList<Interceptor> = arrayListOf()
-        private var factories: ArrayList<Converter.Factory> = arrayListOf()
         private var tag: String = "OkHttp"
 
         private var readTimeout = 30L
@@ -54,29 +51,15 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
             tag = customTag
         }
 
-        fun addInterceptor(interceptor: Interceptor){
-            "addInterceptor".debug(TAG)
-            interceptors.add(interceptor)
-        }
-
-        fun addNetworkInterceptor(interceptor: Interceptor){
-            "addNetworkInterceptor".debug(TAG)
-            networkInterceptors.add(interceptor)
-        }
-
-        fun addConverterFactory(factory: Converter.Factory){
-            "addConverterFactory".debug(TAG)
-            factories.add(factory)
-        }
-
         fun addModule(module: SimpleModule){
-            "addModule $module".debug(TAG)
             jacksonModules.add(module)
         }
 
         fun sslCertificate(cert: Pair<SSLSocketFactory, X509TrustManager>){
             sslCert = cert
         }
+
+        var clientBuilder: ((OkHttpClient.Builder) -> Unit)? = null
     }
 
     private var retrofit: Retrofit? = null
@@ -92,7 +75,7 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
                 .writeTimeout(customWriteTimeout ?: writeTimeout, TimeUnit.SECONDS)
                 .connectTimeout(customConnectionTimeout ?: connectionTimeout, TimeUnit.SECONDS)
                 .retryOnConnectionFailure(true)
-            "Logging interceptor enabled: $logInterceptor".debug(TAG)
+
             if(logInterceptor){
                 val bodyInterceptor = HttpLoggingInterceptor(HttpLoggingInterceptor.Logger { message -> message.info(tag) })
                 bodyInterceptor.level = HttpLoggingInterceptor.Level.BODY
@@ -102,25 +85,12 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
                 client.sslSocketFactory(it.first, it.second)
             }
 
-            "Additional interceptors: ${interceptors.size}".debug(TAG)
-            interceptors.forEach {
-                client.addInterceptor(it)
-            }
-
-            "Additional network interceptors: ${networkInterceptors.size}".debug(TAG)
-            networkInterceptors.forEach {
-                client.addNetworkInterceptor(it)
-            }
+            clientBuilder?.invoke(client)
 
             val builder = Retrofit.Builder()
                     .baseUrl(it)
                     .client(client.build())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
-
-            "Additional converter factories: ${factories.size}".debug(TAG)
-            factories.forEach {
-                builder.addConverterFactory(it)
-            }
 
             retrofit = builder.build()
         } ?: throw Exception(MISSING_INIT_MSG)
