@@ -2,7 +2,7 @@
 
 buildscript {
     ext.eggoid_major = 1
-    ext.eggoid_minor = 10
+    ext.eggoid_minor = 11
     ext.eggoid_bugfix = 0
     ext.eggoid_codename_suffix = ''
 
