@@ -73,7 +73,7 @@ private fun Any?.log(obj: Any? = null, level: Int = ERROR) {
     }
 }
 
-@IntDef(LENGTH_SHORT.toLong(), LENGTH_LONG.toLong())
+@IntDef(LENGTH_SHORT, LENGTH_LONG)
 @Retention(AnnotationRetention.SOURCE)
 annotation class Duration
 
