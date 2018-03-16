@@ -1,14 +1,14 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.eggoid_major = 2
-    ext.eggoid_minor = 0
+    ext.eggoid_major = 1
+    ext.eggoid_minor = 11
     ext.eggoid_bugfix = 0
     ext.eggoid_codename_suffix = ''
 
-    ext.kotlin_version = '1.2.21'
+    ext.kotlin_version = '1.2.30'
 
-    ext.support_version = '27.0.2'
+    ext.support_version = '27.1.0'
     ext.build_tools_version = '27.0.1'
     ext.sdk_version = 27
 
@@ -20,7 +20,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-        classpath "io.realm:realm-gradle-plugin:4.3.3"
+        classpath "io.realm:realm-gradle-plugin:4.3.4"
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
     }

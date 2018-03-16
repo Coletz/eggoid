@@ -1,33 +1,18 @@
 package co.eggon.eggoid
 
 import android.os.Bundle
-import android.support.annotation.StringRes
-import android.support.v4.app.FragmentActivity
-import android.support.v7.app.AlertDialog
-import android.support.v7.app.AppCompatActivity
 import co.eggon.eggoid.extension.create
 import co.eggon.eggoid.extension.debug
 import co.eggon.eggoid.extension.remove
 import co.eggon.eggoid.extension.update
-import io.reactivex.disposables.CompositeDisposable
 import io.realm.*
 import io.realm.exceptions.RealmException
 import kotlin.reflect.KClass
-import android.view.LayoutInflater
-import android.widget.Button
-import android.widget.TextView
 
 
-open class RealmActivity : AppCompatActivity() {
+abstract class RealmActivity : BaseActivity() {
     var realm: Realm? = null
     private var realmConfig: RealmConfiguration? = null
-
-    /*** Dialogs ***/
-    private var loadingDialog: AlertDialog? = null
-    private var errorDialog: AlertDialog? = null
-
-    /*** Rx ***/
-    var disposables = CompositeDisposable()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,17 +25,6 @@ open class RealmActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         close()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        dismissErrorDialog()
-        dismissLoadingDialog()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        disposables.clear()
     }
 
     fun changeConfig(newConfig: RealmConfiguration? = null) {
@@ -119,54 +93,4 @@ open class RealmActivity : AppCompatActivity() {
 
     fun <T : RealmModel> select(kclass: KClass<T>): RealmQuery<T> =
             realm?.where(kclass.java) ?: throw RealmException("Can't query a closed realm")
-
-    /**
-     * Error dialog and loading view
-     **/
-    fun showErrorDialog(@StringRes msg: Int, onClick: (() -> Unit)? = null): AlertDialog? =
-        showErrorDialog(getString(msg), onClick)
-
-    fun showErrorDialog(msg: String? = null, onClick: (() -> Unit)? = null): AlertDialog? {
-        if (!isFinishing) {
-            val message = msg ?: getString(R.string.realm_activity_error)
-            errorDialog = AlertDialog.Builder(this)
-                    .setTitle(R.string.realm_activity_error)
-                    .setMessage(message)
-                    .setCancelable(false)
-                    .setPositiveButton(R.string.realm_activity_ok, { _, _ -> dismissErrorDialog(); onClick?.invoke() })
-                    .show()
-            return errorDialog
-        }
-        return null
-    }
-
-    fun showLoadingDialog(@StringRes msg: Int, @StringRes title: Int? = null): AlertDialog? =
-        title?.let {
-            getString(it)
-        }.let {
-            showLoadingDialog(getString(msg), it)
-        }
-
-    fun showLoadingDialog(msg: String? = null, title: String? = null): AlertDialog? {
-        if (!isFinishing) {
-            val dialoglayout = layoutInflater.inflate(R.layout.realm_activity_loading_dialog, null)
-            dialoglayout.findViewById<TextView>(R.id.realm_activity_loading_message).text = msg ?: getString(R.string.realm_activity_loading)
-
-            loadingDialog = AlertDialog.Builder(this)
-                    .setTitle(title ?: getString(R.string.realm_activity_loading))
-                    .setView(dialoglayout)
-                    .setCancelable(false)
-                    .show()
-            return loadingDialog
-        }
-        return null
-    }
-
-    fun dismissLoadingDialog(){
-        loadingDialog?.dismiss()
-    }
-
-    fun dismissErrorDialog(){
-        errorDialog?.dismiss()
-    }
 }

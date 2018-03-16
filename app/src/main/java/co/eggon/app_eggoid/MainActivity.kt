@@ -1,11 +1,11 @@
 package co.eggon.app_eggoid
 
-import android.app.Activity
 import android.os.Bundle
+import co.eggon.eggoid.BaseActivity
 import co.eggon.eggoid.Nil3
 import co.eggon.eggoid.extension.error
 
-class MainActivity : Activity() {
+class MainActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,5 +20,7 @@ class MainActivity : Activity() {
         } ?: run {
             "NOPE".error()
         }
+
+        showProgressDialog("Please wait", "downloading...", true)
     }
 }
