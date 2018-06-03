@@ -4,6 +4,7 @@ import co.eggon.eggoid.DataListWrapper
 import co.eggon.eggoid.DataWrapper
 import co.eggon.eggoid.RealmPromise
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.realm.*
 import io.realm.exceptions.RealmException
