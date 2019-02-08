@@ -15,6 +15,7 @@ import io.realm.RealmObject
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.CallAdapter
 import retrofit2.Converter
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
@@ -36,7 +37,8 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
 
         private var interceptors: ArrayList<Interceptor> = arrayListOf()
         private var networkInterceptors: ArrayList<Interceptor> = arrayListOf()
-        private var factories: ArrayList<Converter.Factory> = arrayListOf()
+        private var converters: ArrayList<Converter.Factory> = arrayListOf()
+        private var adapters: ArrayList<CallAdapter.Factory> = arrayListOf()
         private var tag: String = "OkHttp"
 
         private var readTimeout = 30L
@@ -64,9 +66,14 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
             networkInterceptors.add(interceptor)
         }
 
-        fun addConverterFactory(factory: Converter.Factory){
+        fun addConverterFactory(converter: Converter.Factory){
             "addConverterFactory".debug(TAG)
-            factories.add(factory)
+            converters.add(converter)
+        }
+
+        fun addCallAdapterFactory(adapter: CallAdapter.Factory){
+            "addConverterFactory".debug(TAG)
+            adapters.add(adapter)
         }
 
         fun addModule(module: SimpleModule){
@@ -117,9 +124,14 @@ class ServiceFactory(customReadTimeout: Long? = null, customWriteTimeout: Long? 
                     .client(client.build())
                     .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
 
-            "Additional converter factories: ${factories.size}".debug(TAG)
-            factories.forEach {
+            "Additional converter factories: ${converters.size}".debug(TAG)
+            converters.forEach {
                 builder.addConverterFactory(it)
+            }
+
+            "Additional call adapter factories: ${adapters.size}".debug(TAG)
+            adapters.forEach {
+                builder.addCallAdapterFactory(it)
             }
 
             retrofit = builder.build()

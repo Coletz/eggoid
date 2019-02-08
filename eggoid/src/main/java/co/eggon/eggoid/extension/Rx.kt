@@ -1,6 +1,7 @@
 package co.eggon.eggoid.extension
 
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Action
@@ -51,3 +52,28 @@ fun <T> Observable<T>.async(): Observable<T> = subscribeOn(Schedulers.newThread(
  * Create a request with text/plain media type
  **/
 fun String.plainTextRequest(): RequestBody = RequestBody.create(MediaType.parse("text/plain"), this)
+
+
+
+
+
+
+/**
+ * Single utilities
+ **/
+fun <T> Single<T>.network(onSuccess: Consumer<T>, onFailure: Consumer<Throwable>): Disposable =
+        onUi().async().subscribe(onSuccess, onFailure)
+
+fun <T> Single<T>.network(onSuccess: ((T) -> Unit), onFailure: ((Throwable) -> Unit)): Disposable =
+    onUi().async().subscribe(onSuccess, onFailure)
+
+/**
+ * Execute the "subscribe" block (Conusmer) on the main thread, aka UI thread
+ **/
+fun <T> Single<T>.onUi(): Single<T> = observeOn(AndroidSchedulers.mainThread())
+
+/**
+ * Execute the observable on a new thread.
+ * Note: you can't execute any graphical change from thread different from the UI thread
+ **/
+fun <T> Single<T>.async(): Single<T> = subscribeOn(Schedulers.newThread())
