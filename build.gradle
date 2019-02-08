@@ -4,7 +4,7 @@ buildscript {
     ext.eggoid_major = 1
     ext.eggoid_minor = 9
     ext.eggoid_bugfix = 1
-    ext.eggoid_codename_suffix = '-legacy-3'
+    ext.eggoid_codename_suffix = '-legacy-4'
 
     ext.kotlin_version = '1.3.21'
 

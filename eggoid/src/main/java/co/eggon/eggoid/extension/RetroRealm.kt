@@ -4,7 +4,9 @@ import co.eggon.eggoid.DataListWrapper
 import co.eggon.eggoid.DataWrapper
 import co.eggon.eggoid.RealmPromise
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.realm.*
 import io.realm.exceptions.RealmException
 
@@ -109,5 +111,36 @@ fun <E : DataListWrapper<out RealmModel>> Observable<E>.wrappedListToRealm(realm
             }, {
                 promise.error?.invoke(it) ?: throw it
             })
+    return promise
+}
+
+
+
+
+
+
+
+
+
+
+
+/*** SINGLE **/
+@Throws(RealmException::class)
+fun <E : RealmModel> Single<E>.objectToRealm(realm: Realm?, update: Boolean = true, disposedBy: CompositeDisposable? = null, beforeSave: ((E) -> Unit)? = null): RealmPromise<E> {
+    val promise = RealmPromise<E>()
+    this.network({
+        if (update) {
+            beforeSave?.invoke(it)
+            realm.update(it)
+                    .then { promise.action?.invoke(it) }
+                    .onError { promise.error?.invoke(it) ?: throw it }
+        } else {
+            realm.create(it) then { promise.action?.invoke(it) } onError { promise.error?.invoke(it) ?: throw it }
+        }
+    }, {
+        promise.error?.invoke(it) ?: throw it
+    }).let { disposable ->
+        disposedBy?.add(disposable)
+    }
     return promise
 }
